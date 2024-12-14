@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Інтернет-магазин "FursikUA"</title>
+    <!-- Підключення CSS -->
+    <style>
+        /* Загальні стилі */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    color: #333;
+    box-sizing: border-box;
+}
+header {
+    background-color: #333;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 1.5em;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+/* Контейнер заголовка */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f5f5f5;
+    transition: opacity 0.3s ease, display 0s ease 0.3s; /* Анімація для плавного зникнення */
+}
+
+.search-bar {
+    text-align: center;
+    margin: 20px auto;
+}
+
+/* Ліва частина заголовка */
+.header-left {
+    flex: 1;
+}
+
+/* Права частина заголовка (відео) */
+.header-right {
+    width: 100%;
+}
+/* Відео у правій частині */
+.header-right iframe {
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+iframe {
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.search-bar input {
+    padding: 10px;
+    width: 60%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+.search-bar button {
+    padding: 10px 15px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #e69500;
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.search-bar button:hover {
+    background-color: #ffa500;
+}/* Вертикальне меню */
+   .nav-bar.vertical {
+    display: flex;
+    flex-direction: column;
+    width: flex; /* Ширина меню */
+    position: static;
+    left: 0;
+    background-color: #333;
+    padding: 10px;
+    height: auto;
+}
+
+    .nav-bar.vertical a {
+    display: block;
+    color: rgb(249, 248, 248);
+    margin: 10px 0;
+    text-align: center;
+    text-decoration: none;
+}
+/* Стилі для випадаючого меню */
+.dropdown {
+    position: relative;
+    padding: 5px;
+}
+.dropdown-content {
+    display: none;
+    position: static;
+    background-color: #444;
+    box-shadow: 0px 20px 16px rgba(0, 0, 0, 0.2);
+    min-width: 260px;
+    z-index: 1;
+    margin-top: 5px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+.dropdown-content a {
+    color: #333;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    border-bottom: 1px solid #d57a7a;
+}
+.dropdown-content a:hover {
+    background-color: #ff6d34;
+}
+.dropdown:hover .dropdown-content {
+display: block;
+}
+/* Сітка товарів */
+/* Контейнер для продуктів у вигляді сітки */
+/* Продукти */
+/* Контейнер для продуктів */
+.product-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Стилі для продукту */
+.product-item {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+}
+
+.product-item:hover {
+    transform: translateY(-5px);
+}
+
+/* Медіафайли */
+.image-gallery {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.media-file {
+    width: 100%;
+    height: 300px;
+    object-fit: contain;
+    display: none; /* Ховаємо всі файли за замовчуванням */
+    margin-bottom: 10px;
+}
+
+.media-file:first-of-type {
+    display: block; /* Показуємо перший файл */
+}
+
+.product-item img {
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.product-item video,
+.product-item audio {
+    background-color: #000;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+/* Стили для посилань */
+.product-item a {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.product-item a:hover {
+    text-decoration: underline;
+}
+
+/* Кнопки перемикання */
+.image-gallery button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 50%;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.image-gallery button:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.image-gallery button:nth-of-type(1) {
+    left: 10px;
+}
+
+.image-gallery button:nth-of-type(2) {
+    right: 10px;
+}
+
+/* Опис товару */
+.product-item h3 {
+    margin: 10px 0;
+    font-size: 1.2em;
+}
+
+.product-item p {
+    margin: 10px 0;
+    color: #555;
+    font-size: 0.95em;
+}
+
+/* Кнопки */
+.product-item button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    background-color: #ffa500;
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.product-item button:hover {
+    background-color: #e69500;
+}
+/* Стилі для модального вікна */
+.product-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Темний напівпрозорий фон */
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease; /* Анімація появи */
+}
+
+.product-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.product-modal-content {
+    background-color: #fff; /* Білий фон для контенту */
+    border-radius: 10px; /* Закруглені кути */
+    padding: 20px;
+    width: 90%;
+    max-width: 700px; /* Максимальна ширина */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); /* Тінь */
+    animation: scaleUp 0.3s ease; /* Анімація появи */
+    position: relative;
+    overflow-y: auto; /* Прокрутка для довгих описів */
+    max-height: 90%;
+}
+
+/* Анімація збільшення */
+@keyframes scaleUp {
+    from {
+        transform: scale(0.8);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+.product-modal .product-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 60px;
+    color: #ff6d34;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.product-modal .product-close:hover {
+    color: #000;
+}
+
+.product-modal h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.product-modal p {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.product-modal img,
+.product-modal video {
+    width: 300px;
+    height: 100%;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.product-modal button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ff6d34; /* Синя кнопка */
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.product-modal button:hover {
+    background-color: #ffa500; /* Трохи темніший синій */
+}
+
+/* Адаптивність */
+@media (max-width: 768px) {
+    .product-modal-content {
+        width: 95%; /* Зменшена ширина для мобільних пристроїв */
+    }
+
+    .product-modal h2 {
+        font-size: 20px;
+    }
+
+    .product-modal p {
+        font-size: 14px;
+    }
+}
+
+/* Модальне вікно (приховане за замовчуванням) */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+/* Контейнер для модального вікна */
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 90%;
+    max-width: 300px;
+    text-align: center;
+    position: relative;
+}
+
+/* Кнопка закриття */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* Стилі для полів введення */
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Загальні стилі для кнопок */
+button {
+    padding: 10px;
+    width: 100%;
+    background-color: #ffa500;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+/* Футер */
+footer {
+    text-align: center;
+    padding: 10px 0;
+    background-color: #333;
+    color: white;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+#cart {
+position: fixed;
+top: 120px; /* Відступ від верхнього краю заголовка */
+right: 20px; /* Відступ від правого краю */
+background-color: #ffa500;
+color: white;
+padding: 10px;
+border-radius: 5px;
+font-size: 14px;
+text-align: center;
+z-index: 1000; /* Вищий пріоритет для відображення поверх інших елементів */
+}
+/* Основні стилі для кошика */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+h1 {
+    text-align: center;
+}
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    background-color: white;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+.cart-item h3 {
+    margin: 0;
+}
+.total {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: right;
+    margin-top: 20px;
+}
+.remove-button {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+#orderForm input {
+width: 100%;
+padding: 8px;
+margin: 5px 0;
+border: 1px solid #ddd;
+border-radius: 5px;
+}
+
+#orderForm button {
+margin-top: 10px;
+padding: 10px;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+}
+
+#orderForm button {
+    margin-top: 10px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #ffa500;
+    color: white;
+}
+/* Модальне вікно (приховане за замовчуванням) */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Напівпрозорий фон */
+    justify-content: center;
+    align-items: center;
+}
+
+/* Контейнер для модального вікна */
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 90%; /* Використовується ширина 90% для мобільних */
+    max-width: 300px;
+    text-align: center;
+    position: relative;
+}
+
+/* Кнопка закриття */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* Стилі для полів введення */
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+
+
+    </style>
+</head>
+<body>
+
+    <!-- Заголовок сайту -->
+    <header>
+        Інтернет-магазин "FursikUA"   
+                <!-- Основний блок кошика -->
+                <div id="cart">
+                    Кошик: <span id="cart-count">0</span> товарів | <span id="cart-total">0 грн</span>
+                    <button onclick="goToCart()">Перейти до кошика</button>
+                    </div>            
+
+    <!-- Пошуковий рядок -->
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Пошук товарів...">
+        <button onclick="searchProducts()">Пошук</button>
+    </div>
+        </header>
+<div class="header-container">
+    <div class="header-left">
+    <!-- Основне меню -->
+    <div class="nav-bar vertical">
+        <a href="index.html">Головна</a>
+        <div class="dropdown">
+            <a href="#">Каталог товарів</a>
+            <div class="dropdown-content">
+                <a href="home-products.html">Товари для дому</a>
+                <a href="electronics.html">Електроніка</a>
+                <a href="clothing.html">Одяг</a>
+                <a href="sports.html">Спорт</a>
+                <a href="toys.html">товари для дітей</a>
+                <a href="auto-goods.html">Авто-товари</a>
+            </div>
+        </div>
+        <a href="#">Акції</a>
+        <a href="#">Доставка та оплата</a>
+        <a href="#">Контакти</a>
+        <!-- Кнопка Вхід -->
+        <button id="loginButton">Вхід</button>
+
+    <!-- Модальне вікно для логіна -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Вхід</h2>
+            <label for="username">Логін:</label>
+            <input type="text" id="username" placeholder="Введіть логін">
+            <label for="password">Пароль:</label>
+            <input type="password" id="password" placeholder="Введіть пароль">
+            <button onclick="login()">Увійти</button>
+        </div>
+    </div>
+</div>
+</div>
+    <div class="header-right">
+        <iframe 
+            width="100%" 
+            height="300" 
+            src="https://www.youtube.com/embed/RmfapODqRWk" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+        </iframe>
+    </div>
+</div>
+
+<div class="product-grid" id="product-list">
+    <!-- Продукти будуть додані через JavaScript -->
+</div>
+<!-- Модальне вікно для детального перегляду товару -->
+<div id="productDetailModal" class="product-modal" style="display: none;">
+    <div class="product-modal-content">
+        <span class="product-close" onclick="closeProductDetailModal()">&times;</span>
+        <h2 id="detail-product-name"></h2>
+        <div id="detail-product-gallery"></div>
+        <p id="detail-product-description"></p>
+        <p id="detail-product-price"></p>
+        <button onclick="addToCartFromDetailModal()">Додати в кошик</button>
+    </div>
+</div>
+
+        <!-- Сюди буде додано товари з localStorage -->
+        <div id="status"></div>
+    </div>
+
+    <!-- Футер -->
+    <footer>
+        &copy; 2024 Інтернет-магазин "FursikUA". Всі права захищені.
+    </footer>
+
+    <!-- JavaScript для роботи кошика -->
+    <script>
+        const productGrid = document.querySelector('.product-grid');
+
+// Відображення модального вікна при натисканні на кнопку "Вхід"
+const loginButton = document.getElementById('loginButton');
+const loginModal = document.getElementById('loginModal');
+const closeModal = document.querySelector('.close');
+
+document.getElementById('search-input').addEventListener('input', searchProducts);
+
+const headerContainer = document.querySelector('.header-container'); // Знаходимо header-container
+
+function searchProducts() {
+    const query = document.getElementById('search-input').value.trim().toLowerCase(); // Отримуємо запит користувача
+    
+    // Приховуємо або показуємо header-container залежно від наявності тексту в полі пошуку
+    if (query !== '') {
+        headerContainer.style.display = 'none'; // Приховуємо header-container
+    } else {
+        headerContainer.style.display = 'flex'; // Повертаємо header-container
+    }
+
+    // Фільтруємо товари за назвою або описом
+    const filteredProducts = products.filter(product => 
+        product.name.toLowerCase().includes(query) || 
+        product.description.toLowerCase().includes(query)
+    );
+
+    // Відображення результатів пошуку
+    if (filteredProducts.length === 0) {
+        document.getElementById('product-list').innerHTML = '<p>Товарів за вашим запитом не знайдено.</p>';
+    } else {
+        renderProducts(filteredProducts); // Відображаємо відфільтровані товари
+    }
+}
+
+loginButton.onclick = function() {
+    loginModal.style.display = 'flex';
+};
+
+closeModal.onclick = function() {
+    loginModal.style.display = 'none';
+};
+
+// Закриття модального вікна при кліку за його межами
+window.onclick = function(event) {
+    if (event.target == loginModal) {
+        loginModal.style.display = 'none';
+    }
+};
+
+// Функція для перевірки логіна і пароля
+function login() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    if (username === 'admin' && password === 'password123') {
+        window.location.href = 'admin.html';
+    } else {
+        alert('Неправильний логін або пароль');
+    }
+}
+// Додано подію закриття при кліку поза межами модального вікна
+document.getElementById('productDetailModal').addEventListener('click', function (event) {
+    // Перевіряємо, чи клікнув користувач саме на контейнер модального вікна, а не на його вміст
+    if (event.target === this) {
+        closeProductDetailModal();
+    }
+});
+function openProductDetailModal(index) {
+    const productModal = document.getElementById('productDetailModal');
+    const product = products[index];
+    if (!product) return;
+
+    // Заповнення інформації про товар
+    document.getElementById('detail-product-name').innerText = product.name;
+    document.getElementById('detail-product-description').innerText = product.description;
+    document.getElementById('detail-product-price').innerText = `${product.price} грн`;
+
+    // Галерея зображень або відео
+    const gallery = product.files.map(file => {
+        const fileExtension = file.split('.').pop().toLowerCase();
+        const fileUrl = `http://127.0.0.1:5000/${file}`;
+
+        if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+            return `<img src="${fileUrl}"  alt="${product.name}">`;
+        } else if (['mp4', 'avi', 'webm'].includes(fileExtension)) {
+            return `<video controls >
+                        <source src="${fileUrl}" type="video/${fileExtension}">
+                    </video>`;
+        } else {
+            return `<a href="${fileUrl}" target="_blank">Переглянути файл</a>`;
+        }
+    }).join('');
+
+    document.getElementById('detail-product-gallery').innerHTML = gallery;
+
+    // Відображення модального вікна
+    document.getElementById('productDetailModal').style.display = 'flex';
+
+    // Зберігаємо індекс товару для функції "Додати в кошик"
+    window.currentDetailModalProductIndex = index;
+        // Відображаємо модальне вікно
+        productModal.classList.add('active');
+}
+// Функція закриття модального вікна
+function closeProductDetailModal() {
+    document.getElementById('productDetailModal').classList.remove('active');
+}
+function addToCartFromDetailModal() {
+    if (window.currentDetailModalProductIndex != null) {
+        addToCart(window.currentDetailModalProductIndex);
+        alert('Товар додано в кошик');
+        closeProductDetailModal();
+    }
+}
+
+let products = []; // Список усіх товарів
+const filterPrefix = "to"; // Префікс для фільтрації товарів (змінюється залежно від категорії)
+
+async function loadProducts() {
+    try {
+        const response = await fetch('http://127.0.0.1:5000/products');
+        if (!response.ok) throw new Error('Помилка завантаження товарів');
+        products = await response.json();
+
+        // Фільтруємо товари за префіксом артикула
+        const filteredProducts = products.filter(product => 
+            product.article && product.article.startsWith(filterPrefix)
+        );
+
+        renderProducts(filteredProducts); // Відображаємо відфільтровані товари
+    } catch (error) {
+        console.error('Помилка завантаження:', error);
+        document.getElementById('product-list').innerHTML = '<p>Помилка завантаження товарів</p>';
+    }
+}
+
+// Відображення товарів
+function renderProducts(productsToRender) {
+    const productList = document.getElementById('product-list');
+    productList.innerHTML = '';
+
+    productsToRender.forEach((product, index) => {
+        const shortDescription = product.description.length > 100
+            ? product.description.substring(0, 100) + '...'
+            : product.description;
+
+        const gallery = product.files.map((file, fileIndex) => {
+            const fileExtension = file.split('.').pop().toLowerCase();
+            const fileUrl = `http://127.0.0.1:5000/${file}`;
+
+            if (['mp4', 'mov', 'avi', 'webm'].includes(fileExtension)) {
+                return `
+                    <video data-file-index="${fileIndex}" class="media-file" controls style="width:300px; height:300px; display: ${fileIndex === 0 ? 'block' : 'none'};">
+                        <source src="${fileUrl}" type="video/${fileExtension}">
+                        Ваш браузер не підтримує відтворення цього відео.
+                    </video>
+                `;
+            } else if (['jpg', 'jpeg', 'png', 'gif', 'bmp'].includes(fileExtension)) {
+                return `
+                    <img data-file-index="${fileIndex}" class="media-file" src="${fileUrl}" style="width:300px; height:300px; display: ${fileIndex === 0 ? 'block' : 'none'};" alt="${product.name}">
+                `;
+            } else if (['mp3', 'wav', 'ogg'].includes(fileExtension)) {
+                return `
+                    <audio data-file-index="${fileIndex}" class="media-file" controls style="width:300px; height:50px; display: ${fileIndex === 0 ? 'block' : 'none'};">
+                        <source src="${fileUrl}" type="audio/${fileExtension}">
+                        Ваш браузер не підтримує відтворення цього аудіофайлу.
+                    </audio>
+                `;
+            } else {
+                return `<a href="${fileUrl}" target="_blank" class="media-file" style="display: ${fileIndex === 0 ? 'block' : 'none'};">Переглянути файл</a>`;
+            }
+        }).join('');
+
+        const navigationButtons = product.files.length > 1
+            ? `
+                <button onclick="changeMedia(${index}, -1)">Назад</button>
+                <button onclick="changeMedia(${index}, 1)">Далі</button>
+            `
+            : '';
+
+        productList.innerHTML += `
+            <div class="product-item">
+                <h3>${product.name}</h3>
+                <div id="media-${index}" class="image-gallery">${gallery}</div>
+                ${navigationButtons}
+                <p id="description-${index}">${shortDescription}</p>
+                <button onclick="openProductDetailModal(${index})">Детальніше</button>
+                <p>${product.price} грн</p>
+                <button onclick="addToCart(${index})">Додати в кошик</button>
+            </div>
+        `;
+    
+        enableSwipe(index); // Додаємо підтримку свайпів для цього товару
+    });
+}
+// Завантаження товарів після завантаження сторінки
+document.addEventListener('DOMContentLoaded', loadProducts);
+
+function addProduct(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("new-name").value;
+    const price = parseFloat(document.getElementById("new-price").value);
+    const description = document.getElementById("new-description").value;
+    const fileInput = document.getElementById("new-file");
+
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('price', price);
+    formData.append('description', description);
+
+    for (let i = 0; i < fileInput.files.length; i++) {
+        formData.append('file', fileInput.files[i]);
+    }
+
+    fetch('http://127.0.0.1:5000/upload', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('status').textContent = 'Файл(и) успішно завантажено!';
+            loadProducts();
+            document.getElementById("add-product-form").reset();
+        } else {
+            document.getElementById('status').textContent = 'Помилка при завантаженні файлу.';
+        }
+    })
+    .catch(error => {
+        document.getElementById('status').textContent = 'Помилка на сервері.';
+        console.error('Error:', error);
+    });
+}
+
+
+// Структура кошика
+const cart = JSON.parse(localStorage.getItem('cart')) || { items: [], total: 0 };
+
+function updateCartDisplay() {
+    const cartCount = document.getElementById('cart-count');
+    const cartTotal = document.getElementById('cart-total');
+    cartCount.textContent = cart.items.length;
+    cartTotal.textContent = cart.total + ' грн';
+}
+
+function addToCart(index) {
+    const product = products[index];
+    if (!product) return;
+
+    cart.items.push(product);
+    cart.total += product.price;
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartDisplay();
+}
+
+function goToCart() {
+    window.location.href = 'cart.html';
+}
+
+function changeMedia(productIndex, direction) {
+    const product = products[productIndex];
+    if (!product || !product.files.length) return;
+
+    // Отримуємо всі медіа елементи для цього товару
+    const mediaElements = document.querySelectorAll(`#media-${productIndex} .media-file`);
+
+    // Знаходимо індекс поточного видимого елемента
+    let currentIndex = Array.from(mediaElements).findIndex(el => el.style.display === 'block');
+
+    // Якщо поточного елемента не знайдено, почнемо з першого
+    if (currentIndex === -1) {
+        currentIndex = 0;
+    }
+
+    // Обчислюємо новий індекс
+    let newIndex = (currentIndex + direction + product.files.length) % product.files.length;
+
+    // Оновлюємо видимість медіафайлів
+    mediaElements.forEach((el, index) => {
+        el.style.display = index === newIndex ? 'block' : 'none'; // Показуємо/ховаємо елементи
+    });
+}
+function enableSwipe(productIndex) {
+    const mediaContainer = document.getElementById(`media-${productIndex}`);
+    if (!mediaContainer) return;
+
+    let startX = 0; // Початкова координата X
+    let endX = 0; // Кінцева координата X
+
+    // Початок свайпу
+    mediaContainer.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+    });
+
+    // Завершення свайпу
+    mediaContainer.addEventListener('touchend', (e) => {
+        endX = e.changedTouches[0].clientX;
+
+        // Визначаємо напрямок свайпу
+        const swipeDistance = endX - startX;
+        if (swipeDistance > 50) {
+            // Свайп вправо (назад)
+            changeMedia(productIndex, -1);
+        } else if (swipeDistance < -50) {
+            // Свайп вліво (вперед)
+            changeMedia(productIndex, 1);
+        }
+    });
+}
+
+function toggleDescription(index) {
+    const descriptionElement = document.getElementById(`description-${index}`);
+    const toggleButton = document.getElementById(`toggle-btn-${index}`);
+    const product = products[index];
+
+    if (toggleButton.innerText === "Детальніше") {
+        descriptionElement.textContent = product.description;
+        toggleButton.innerText = "Згорнути";
+    } else {
+        const shortDescription = product.description.length > 100
+            ? product.description.substring(0, 100) + '...'
+            : product.description;
+        descriptionElement.textContent = shortDescription;
+        toggleButton.innerText = "Детальніше";
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadProducts();
+    updateCartDisplay();
+});
+
+    </script>
+</body>
+</html>

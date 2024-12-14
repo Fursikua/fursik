@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Інтернет-магазин "FursikUA"</title>
+    <!-- Підключення CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- Заголовок і пошуковий рядок на одному фоні -->
+<div class="main-header">
+    <!-- Фото ліворуч -->
+    <div class="logo-container">
+        <img src="images/FursikUA_Emblem.jpg" alt="FursikUA Logo" class="logo">
+    </div>
+    <!-- Інші елементи праворуч -->
+    <div class="content-container">
+        <div class="site-logo">
+            <div class="logo-icon"></div>
+            <a href="index.html">Інтернет-магазин "FursikUA"</a>
+        </div>
+        <!-- Пошуковий рядок -->
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Пошук товарів...">
+            <button onclick="searchProducts()">Пошук</button>
+        </div>
+    </div>
+</div>
+<header>
+                <!-- Основний блок кошика -->
+<!-- Блок кошика на головній сторінці -->
+<div id="cart-icon" class="cart-icon">
+    <img src="https://media.istockphoto.com/id/1206806317/uk/%D0%B2%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%BD%D1%96-%D0%B7%D0%BE%D0%B1%D1%80%D0%B0%D0%B6%D0%B5%D0%BD%D0%BD%D1%8F/%D0%BF%D1%96%D0%BA%D1%82%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%B0-%D0%BA%D0%BE%D1%88%D0%B8%D0%BA%D0%B0-%D0%B4%D0%BB%D1%8F-%D0%BF%D0%BE%D0%BA%D1%83%D0%BF%D0%BE%D0%BA-%D1%96%D0%B7%D0%BE%D0%BB%D1%8C%D0%BE%D0%B2%D0%B0%D0%BD%D0%B0-%D0%BD%D0%B0-%D0%B1%D1%96%D0%BB%D0%BE%D0%BC%D1%83-%D1%82%D0%BB%D1%96.jpg?s=612x612&w=0&k=20&c=ESWl1nO341vdKZK_tIAJkVRc0FNM72OcWXf0K8ePVFw=" alt="Кошик" id="cart-icon-img"> <!-- Ваша картинка кошика -->
+    <div id="cart-details" class="cart-details">
+        <h3>Ваш кошик</h3>
+        <div id="cart-items"></div>
+        <div class="total">
+            Загальна сума: <span id="cart-total">0 грн</span>
+        </div>
+        <button onclick="goToCart()">Перейти до кошика</button>
+        <button onclick="clearCart()">Очистити кошик</button>
+    </div>
+</div>
+        </header>
+<div class="header-container">
+    <div class="header-left">
+    <!-- Основне меню -->
+    <div class="nav-bar vertical">
+        <a href="index.html">Головна</a>
+        <div class="dropdown">
+            <a href="#">Каталог товарів</a>
+            <div class="dropdown-content">
+                <a href="#" onclick="filterProductsByArticlePrefix('hp')">Товари для дому</a>
+                <a href="#" onclick="filterProductsByArticlePrefix('el')">Електроніка</a>
+                <a href="#" onclick="filterProductsByArticlePrefix('cl')">Одяг</a>
+                <a href="#" onclick="filterProductsByArticlePrefix('sp')">Спорт</a>
+                <a href="#" onclick="filterProductsByArticlePrefix('to')">Товари для дітей</a>
+                <a href="#" onclick="filterProductsByArticlePrefix('ag')">Авто-товари</a>
+            </div>
+        </div>
+        <a href="#promo-products">Акційні товари</a>
+        <a href="#delivery-payment">Доставка та оплата</a>
+        <a href="#contacts">Контакти</a>
+                <!-- Кнопка Вхід -->
+        <button id="loginButton">Вхід</button>
+
+    <!-- Модальне вікно для логіна -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Вхід</h2>
+            <label for="username">Логін:</label>
+            <input type="text" id="username" placeholder="Введіть логін">
+            <label for="password">Пароль:</label>
+            <input type="password" id="password" placeholder="Введіть пароль">
+            <button onclick="login()">Увійти</button>
+        </div>
+    </div>
+</div>
+</div>
+    <div class="header-right">
+        <iframe 
+            width="100%" 
+            height="300" 
+            src="https://www.youtube.com/embed/RmfapODqRWk" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+        </iframe>
+    </div>
+</div>
+
+<div class="product-grid" id="product-list">
+    <!-- Продукти будуть додані через JavaScript -->
+</div>
+<!-- Модальне вікно для детального перегляду товару -->
+<div id="productDetailModal" class="product-modal" style="display: none;">
+    <div class="product-modal-content">
+        <span class="product-close" onclick="closeProductDetailModal()">&times;</span>
+        <h2 id="detail-product-name"></h2>
+        <div id="detail-product-gallery"></div>
+        <p id="detail-product-description"></p>
+        <p id="detail-product-price"></p>
+        <button onclick="addToCartFromDetailModal()">Додати в кошик</button>
+    </div>
+</div>
+
+        <!-- Сюди буде додано товари з localStorage -->
+        <div id="status"></div>
+    </div>
+
+    <section id="promo-products">
+        <h2>Акційні товари</h2>
+        <div class="promo-products-container">
+            <div class="promo-products-wrapper">
+                <!-- Товари будуть додаватися тут через JavaScript -->
+    </section>
+                        
+    <section id="delivery-payment">
+        <h2>Доставка і оплата</h2>
+        <h3>Доставка:</h3>
+        <ul>
+            <li>Кур'єр доставляє товари по Дністровському району Чернівецької області.</li>
+            <li>Ми відправляємо товари поштою по всій Україні.</li>
+            <li>Також можна забрати товар самостійно за адресою: Чернівецька область, м. Сокиряни, вул. Володимира Великого, 19.</li>
+        </ul>
+        <h3>Скільки часу займає доставка:</h3>
+        <p>Зазвичай доставка займає від 1 до 3 робочих днів залежно від вашого міста.</p>
+        <h3>Як оплатити:</h3>
+        <ul>
+            <li>Ви можете заплатити готівкою, коли отримаєте товар.</li>
+            <li>Або перевести гроші через банк за нашими реквізитами.</li>
+        </ul>
+    </section>
+    
+    <section id="contacts">
+        <h2>Контакти</h2>
+        <ul>
+            <li><strong>Наш телефон:</strong> +380 502694611</li>
+            <li><strong>Напишіть нам на email:</strong> <a href="https://mail.google.com/mail/?view=cm&fs=1&to=uafursik@gmail.com" target="_blank">uafursik@gmail.com</a></li>
+            <li><strong>Ми в соцмережах:</strong>
+                <ul>
+                    <li><a href="#">Facebook</a></li>
+                    <li><a href="#">Instagram</a></li>
+                    <li><a href="https://t.me/your-telegram-link">Telegram</a></li>
+                </ul>
+            </li>
+            <li><strong>Де ми знаходимося:</strong> 
+                <a href="https://maps.app.goo.gl/c1Y1X4TH5ZUzyfmQA" target="_blank">Подивитися на карті</a>
+            </li>
+            <!-- Вбудована карта -->
+            <div>
+                <iframe 
+                    width="350" 
+                    height="450" 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2855.665572303819!2d25.90756611546042!3d48.22948767350709!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4731dd8f2cc28c87%3A0x3f46d5ff9188f8ab!2sSokiryany%2C%20Chernivtsi%20Oblast%2C%20Ukraine!5e0!3m2!1sen!2sua!4v1667675945481!5m2!1sen!2sua" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+                    </ul>
+    </section>
+    <!-- Футер -->
+    <footer>
+        &copy; 2024 Інтернет-магазин "FursikUA". Всі права захищені.
+    </footer>
+
+    <!-- JavaScript для роботи кошика -->
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="stiladmin.css">
+     <style>
+        .image-gallery {
+            position: relative;
+            display: inline-block;
+        }
+
+        .gallery-img {
+    width: 300px;
+    height: 300px;
+    object-fit: contain;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+        .navigation-buttons {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .prev, .next {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .prev {
+            border-radius: 5px 0 0 5px;
+        }
+
+        .next {
+            border-radius: 0 5px 5px 0;
+        }
+        .product-item {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.product-item h3 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.product-item p {
+    font-size: 1em;
+    margin-bottom: 10px;
+}
+
+.product-item button {
+    margin-right: 10px;
+    padding: 8px 12px;
+    font-size: 0.9em;
+    border-radius: 5px;
+    border: none;
+    background-color: #007BFF;
+    color: white;
+    cursor: pointer;
+}
+
+.product-item button:hover {
+    background-color: #0056b3;
+}
+
+    </style>
+</head>
+<body>
+
+    <!-- Заголовок сайту -->
+    <header>
+
+        <h1><a href="index.html">Інтернет-магазин "FursikUA</a></h1>
+    </header>
+    <h2>Завантажити фон для головної сторінки</h2>
+    <form id="upload-background-form">
+        <label for="background-file">Файл зображення:</label>
+        <input type="file" id="background-file" required>
+        <button type="submit">Завантажити</button>
+    </form>    
+    <div id="background-status"></div>
+    <h2>Додати товар</h2>
+    <form id="add-product-form" onsubmit="addProduct(event)">
+        <label for="new-name">Назва:</label>
+        <input type="text" id="new-name" required>
+        <label for="new-article">Артикул:</label>
+        <input type="text" id="new-article" required>
+        <label for="new-price">Ціна:</label>
+        <input type="number" id="new-price" required>
+        <label for="new-old-price">Стара ціна:</label>
+        <input type="number" id="new-old-price">        
+        <label for="new-description">Опис:</label>
+        <textarea id="new-description" required></textarea>
+        <label for="new-file">Зображення/Відео (файл):</label>
+        <input type="file" id="new-file" name="file" multiple>
+        <button type="submit">Додати товар</button>
+        <button type="button" id="update-button" style="display:none" onclick="updateProduct(event)">Оновити товар</button>
+    </form>
+    
+    <h2>Пошук товару</h2>
+    <input type="text" id="search-article" placeholder="Введіть артикул" oninput="searchProductByArticle()">
+    <div id="search-result"></div>
+    
+    <h2>Список товарів</h2>
+    <div id="product-list"></div>
+
+    <div id="status"></div>
+
+    <script>
+document.getElementById('upload-background-form').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const fileInput = document.getElementById('background-file');
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    try {
+        const response = await fetch('http://127.0.0.1:5000/upload-background', {
+            method: 'POST',
+            body: formData,
+        });
+        const result = await response.json();
+        if (result.success) {
+            document.getElementById('background-status').textContent = 'Фон успішно завантажено!';
+            // Збереження шляху до фону в localStorage
+            const backgroundUrl = `http://127.0.0.1:5000${result.file}`;
+            localStorage.setItem('backgroundImage', backgroundUrl);
+            applyBackground(); // Оновлюємо фон на сторінці
+        } else {
+            document.getElementById('background-status').textContent = result.message;
+        }
+    } catch (error) {
+        console.error('Помилка:', error);
+        document.getElementById('background-status').textContent = 'Помилка на сервері.';
+    }
+});
+
+// Функція для застосування фону на сторінці
+function applyBackground() {
+    const backgroundImage = localStorage.getItem('backgroundImage');
+    if (backgroundImage) {
+        document.body.style.backgroundImage = `url(${backgroundImage})`;
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center';
+    }
+}
+
+// Встановлюємо фон при завантаженні сторінки
+window.onload = applyBackground;
+
+function searchProductByArticle() {
+    const searchValue = document.getElementById('search-article').value.trim().toLowerCase();
+    const productList = document.getElementById('product-list');
+    productList.innerHTML = ''; // Очищуємо список товарів
+
+    if (!searchValue) {
+        productList.innerHTML = '<p>Введіть артикул для пошуку.</p>';
+        return;
+    }
+
+    // Фільтруємо товари за частковим збігом артикула
+    const filteredProducts = products.filter(product => 
+        product.article && product.article.toLowerCase().includes(searchValue)
+    );
+
+    if (filteredProducts.length === 0) {
+        productList.innerHTML = '<p>Товар не знайдено.</p>';
+    } else {
+        renderProducts(filteredProducts); // Використовуємо існуючу функцію для рендерингу
+    }
+}
+
+let products = []; // Глобальний масив для зберігання всіх продуктів
+let currentEditingIndex = null; // Індекс товару, який редагується
+
+async function loadProducts() {
+    try {
+        const response = await fetch('http://127.0.0.1:5000/products');
+        if (!response.ok) throw new Error('Помилка завантаження товарів');
+        products = await response.json();
+        renderProducts(products);
+    } catch (error) {
+        console.error('Помилка завантаження:', error);
+        document.getElementById('product-list').innerHTML = '<p>Помилка завантаження товарів</p>';
+    }
+}
+
+function renderProducts(products) {
+    const productList = document.getElementById('product-list');
+    productList.innerHTML = '';
+
+    if (!products || !products.length) {
+        productList.innerHTML = '<p>Немає доступних товарів.</p>';
+        return;
+    }
+
+    products.forEach((product, index) => {
+        const oldPriceHTML = product.oldPrice ? `<span class="old-price">${product.oldPrice} грн</span>` : '';
+        const newPriceHTML = `<span class="new-price">${product.price} грн</span>`;
+        let filesHTML = product.files.map(file => {
+            const fileExtension = file.split('.').pop().toLowerCase();
+            if (['mp4', 'mov', 'avi'].includes(fileExtension)) {
+                return `
+                    <video controls class="gallery-img" style="width:300px; height:300px;">
+                        <source src="http://127.0.0.1:5000${file}" type="video/${fileExtension}">
+                        Ваш браузер не підтримує відтворення цього відео.
+                    </video>
+                `;
+            } else if (['png', 'jpg', 'jpeg', 'gif'].includes(fileExtension)) {
+                return `<img src="http://127.0.0.1:5000${file}" class="gallery-img" alt="Product image" style="width:300px; height:300px;">`;
+            } else {
+                return `<p>Непідтримуваний тип файлу: ${file}</p>`;
+            }
+        }).join('');
+
+        productList.innerHTML += `
+            <div id="product-${index}">
+                <h3>${product.name}</h3>
+                <p>Артикул: ${product.article}</p>
+                <div class="image-gallery">
+                    ${filesHTML}
+                </div>
+                <p>${product.description}</p>
+                <div class="prices">
+                    ${oldPriceHTML} ${newPriceHTML}
+                </div>
+                <button onclick="editProduct(${index})">Редагувати</button>
+                <button onclick="deleteProduct(${index})">Видалити</button>
+            </div>
+            <hr>
+        `;
+    });
+}
+
+function addProduct(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("new-name").value;
+    const article = document.getElementById("new-article").value;
+    const price = parseFloat(document.getElementById("new-price").value);
+    const oldPrice = parseFloat(document.getElementById("new-old-price").value)|| null;
+    const description = document.getElementById("new-description").value;
+    const fileInput = document.getElementById("new-file");
+
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('article', article); // Додаємо артикул
+    formData.append('price', price);
+    formData.append('oldPrice', oldPrice);
+    formData.append('description', description);
+
+    for (let i = 0; i < fileInput.files.length; i++) {
+        formData.append('file', fileInput.files[i]);
+    }
+
+    fetch('http://127.0.0.1:5000/upload', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('status').textContent = 'Файл(и) успішно завантажено!';
+            loadProducts();
+            document.getElementById("add-product-form").reset();
+        } else {
+            document.getElementById('status').textContent = 'Помилка при завантаженні файлу.';
+        }
+    })
+    .catch(error => {
+        document.getElementById('status').textContent = 'Помилка на сервері.';
+        console.error('Error:', error);
+    });
+}
+
+function editProduct(index) {
+    const product = products[index];
+    document.getElementById("new-name").value = product.name;
+    document.getElementById("new-article").value = product.article;
+    document.getElementById("new-price").value = product.price;
+    document.getElementById("new-old-price").value = product.oldPrice || ''; // Стара ціна
+    document.getElementById("new-description").value = product.description;
+
+    // Відображаємо існуючі файли
+    const existingFilesContainer = document.createElement('div');
+    existingFilesContainer.id = "existing-files";
+    existingFilesContainer.innerHTML = `
+        <h4>Наявні файли:</h4>
+        ${product.files.map((file, fileIndex) => `
+            <div id="file-${fileIndex}">
+                <a href="http://127.0.0.1:5000${file}" target="_blank">${file}</a>
+                <button type="button" onclick="removeFile(${index}, ${fileIndex})">Видалити</button>
+            </div>
+        `).join('')}
+    `;
+    
+    // Додаємо до форми (перед кнопками)
+    const form = document.getElementById("add-product-form");
+    form.insertBefore(existingFilesContainer, form.lastElementChild);
+
+    // Показуємо кнопку оновлення
+    document.getElementById("update-button").style.display = "inline-block";
+    document.querySelector('button[type="submit"]').style.display = "none";
+
+    // Зберігаємо індекс редагованого товару
+    currentEditingIndex = index;
+
+    // Прокрутка до форми
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function removeFile(productIndex, fileIndex) {
+    fetch(`http://127.0.0.1:5000/products/${productIndex}/files/${fileIndex}`, {
+        method: 'DELETE',
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById(`file-${fileIndex}`).remove();
+            products[productIndex].files.splice(fileIndex, 1); // Видаляємо файл із локального списку
+            alert('Файл успішно видалено!');
+        } else {
+            alert('Помилка при видаленні файлу.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Помилка на сервері.');
+    });
+}
+
+function updateProduct(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("new-name").value;
+    const article = document.getElementById("new-article").value;
+    const price = parseFloat(document.getElementById("new-price").value);
+    const oldPrice = parseFloat(document.getElementById("new-old-price").value) || null;
+    const description = document.getElementById("new-description").value;
+    const fileInput = document.getElementById("new-file");
+
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('article', article);
+    formData.append('price', price);
+    formData.append('oldPrice', oldPrice);
+    formData.append('description', description);
+
+    // Додаємо нові файли, якщо вони завантажені
+    for (let i = 0; i < fileInput.files.length; i++) {
+        formData.append('file', fileInput.files[i]);
+    }
+
+    // Оновлюємо товар на сервері
+    fetch(`http://127.0.0.1:5000/products/${currentEditingIndex}`, {
+        method: 'PUT',
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Товар успішно оновлено!');
+            loadProducts();
+            resetForm();
+        } else {
+            alert('Помилка при оновленні товару.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Помилка на сервері.');
+    });
+}
+function resetForm() {
+    document.getElementById("add-product-form").reset();
+    document.getElementById("update-button").style.display = "none";
+    document.querySelector('button[type="submit"]').style.display = "inline-block";
+    const existingFilesContainer = document.getElementById("existing-files");
+    if (existingFilesContainer) existingFilesContainer.remove();
+    currentEditingIndex = null;
+}
+
+function deleteProduct(index) {
+    fetch(`http://127.0.0.1:5000/products/${index}`, {
+        method: 'DELETE',
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('status').textContent = 'Товар успішно видалено!';
+            loadProducts();
+        } else {
+            document.getElementById('status').textContent = 'Помилка при видаленні товару.';
+        }
+    })
+    .catch(error => {
+        document.getElementById('status').textContent = 'Помилка на сервері.';
+        console.error('Error:', error);
+    });
+}
+function changeImage(productIndex, direction) {
+    const product = products[productIndex];
+    const totalImages = product.files.length;
+
+    // Обчислення нового індексу
+    let newIndex = (currentGalleryIndex + direction + totalImages) % totalImages;
+    currentGalleryIndex = newIndex;
+
+    // Оновлення зображення
+    const imgElement = document.querySelector(`#product-${productIndex} .gallery-img`);
+    imgElement.src = `http://127.0.0.1:5000${product.files[newIndex]}`;
+}
+
+document.addEventListener('DOMContentLoaded', loadProducts);
+</script>
+
+</body>
+</html>
