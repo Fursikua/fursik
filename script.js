@@ -517,6 +517,29 @@ function applyBackground() {
 
 // Викликаємо applyBackground, щоб застосувати фон, коли сторінка завантажена
 window.onload = applyBackground;
+// Додати функцію для кнопки прокрутки догори
+document.addEventListener("DOMContentLoaded", function () {
+    const scrollToTopBtn = document.getElementById("scroll-to-top");
+
+    // Показати/приховати кнопку залежно від прокрутки
+    window.addEventListener("scroll", function () {
+        if (window.scrollY > 500) {
+            scrollToTopBtn.style.opacity = "1";
+            scrollToTopBtn.style.visibility = "visible";
+        } else {
+            scrollToTopBtn.style.opacity = "0";
+            scrollToTopBtn.style.visibility = "hidden";
+        }
+    });
+
+    // Прокрутити догори при натисканні
+    scrollToTopBtn.addEventListener("click", function () {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth" // Плавна прокрутка
+        });
+    });
+});
 
 
 // Завантаження товарів після завантаження сторінки
