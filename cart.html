@@ -153,6 +153,21 @@ button:hover {
             <label>Ім'я: <input type="text" name="name" required></label><br><br>
             <label>Телефон: <input type="tel" name="phone" required></label><br><br>
             <label>Електронна пошта: <input type="email" name="email" required></label><br><br>
+            <label>Область:
+                <select id="region" required>
+                    <option value="">Оберіть область</option>
+                </select>
+            </label><br><br>
+            <label>Населений пункт:
+                <select id="city" disabled required>
+                    <option value="">Оберіть населений пункт</option>
+                </select>
+            </label><br><br>
+            <label>Відділення Нової Пошти:
+                <select id="warehouse" disabled required>
+                    <option value="">Оберіть відділення</option>
+                </select>
+            </label><br><br>
             <button type="submit">Підтвердити замовлення</button>
             <button type="button" onclick="closeOrderForm()">Закрити</button>
         </form>
@@ -335,6 +350,94 @@ ${savedCart.items.map(item => `- ${item.name} (Артикул: ${item.article ||
                 alert('Не вдалося надіслати замовлення. Перевірте підключення до інтернету.');
             }
         };
+// Запит до API Нової Пошти
+const NP_API_KEY = 'de68ced280e7be171ba68100d49e62e3'; // Замініть на ваш ключ API
+
+document.addEventListener('DOMContentLoaded', () => {
+    fetchRegions();
+    
+    document.getElementById('region').addEventListener('change', fetchCities);
+    document.getElementById('city').addEventListener('change', fetchWarehouses);
+});
+
+async function fetchRegions() {
+    const response = await fetch('https://api.novaposhta.ua/v2.0/json/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            apiKey: NP_API_KEY,
+            modelName: 'Address',
+            calledMethod: 'getAreas',
+            methodProperties: {}
+        })
+    });
+    const data = await response.json();
+    const regions = data.data;
+
+    const regionSelect = document.getElementById('region');
+    regions.forEach(region => {
+        const option = document.createElement('option');
+        option.value = region.Ref;
+        option.textContent = region.Description;
+        regionSelect.appendChild(option);
+    });
+}
+
+async function fetchCities() {
+    const regionRef = document.getElementById('region').value;
+    if (!regionRef) return;
+
+    const response = await fetch('https://api.novaposhta.ua/v2.0/json/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            apiKey: NP_API_KEY,
+            modelName: 'Address',
+            calledMethod: 'getSettlements',
+            methodProperties: { AreaRef: regionRef }
+        })
+    });
+    const data = await response.json();
+    const cities = data.data;
+
+    const citySelect = document.getElementById('city');
+    citySelect.innerHTML = '<option value="">Оберіть населений пункт</option>';
+    cities.forEach(city => {
+        const option = document.createElement('option');
+        option.value = city.Ref;
+        option.textContent = city.Description;
+        citySelect.appendChild(option);
+    });
+    citySelect.disabled = false;
+}
+
+async function fetchWarehouses() {
+    const cityRef = document.getElementById('city').value;
+    if (!cityRef) return;
+
+    const response = await fetch('https://api.novaposhta.ua/v2.0/json/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            apiKey: NP_API_KEY,
+            modelName: 'AddressGeneral',
+            calledMethod: 'getWarehouses',
+            methodProperties: { CityRef: cityRef }
+        })
+    });
+    const data = await response.json();
+    const warehouses = data.data;
+
+    const warehouseSelect = document.getElementById('warehouse');
+    warehouseSelect.innerHTML = '<option value="">Оберіть відділення</option>';
+    warehouses.forEach(warehouse => {
+        const option = document.createElement('option');
+        option.value = warehouse.Ref;
+        option.textContent = warehouse.Description;
+        warehouseSelect.appendChild(option);
+    });
+    warehouseSelect.disabled = false;
+}
 
     </script>
 </body>
