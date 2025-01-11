@@ -183,7 +183,7 @@ let filesToDelete = []; // Глобальний список файлів для
 
 async function loadProducts() {
     try {
-        const response = await fetch('http://127.0.0.1:5000/products');
+        const response = await fetch('https://fursik-b40362fa22e8.herokuapp.com/products');
         if (!response.ok) throw new Error('Помилка завантаження товарів');
         products = await response.json();
         renderProducts(products);
@@ -210,12 +210,12 @@ function renderProducts(products) {
             if (['mp4', 'mov', 'avi'].includes(fileExtension)) {
                 return `
                     <video controls class="gallery-img" style="width:300px; height:300px;">
-                        <source src="http://127.0.0.1:5000${file}" type="video/${fileExtension}">
+                        <source src="https://fursik-b40362fa22e8.herokuapp.com${file}" type="video/${fileExtension}">
                         Ваш браузер не підтримує відтворення цього відео.
                     </video>
                 `;
             } else if (['png', 'jpg', 'jpeg', 'gif'].includes(fileExtension)) {
-                return `<img src="http://127.0.0.1:5000${file}" class="gallery-img" alt="Product image" style="width:300px; height:300px;">`;
+                return `<img src="https://fursik-b40362fa22e8.herokuapp.com${file}" class="gallery-img" alt="Product image" style="width:300px; height:300px;">`;
             } else {
                 return `<p>Непідтримуваний тип файлу: ${file}</p>`;
             }
@@ -299,7 +299,7 @@ function addProduct(event) {
     // Додаємо модифікації
     modifications.forEach(modification => formData.append('modification', modification));
 
-    fetch('http://127.0.0.1:5000/upload', {
+    fetch('https://fursik-b40362fa22e8.herokuapp.com/upload', {
         method: 'POST',
         body: formData,
     })
@@ -356,7 +356,7 @@ function editProduct(index) {
         <h4>Наявні файли:</h4>
         ${product.files.map((file, fileIndex) => `
             <div id="file-${fileIndex}" data-file-path="${file}">
-                <a href="http://127.0.0.1:5000${file}" target="_blank">${file}</a>
+                <a href="https://fursik-b40362fa22e8.herokuapp.com${file}" target="_blank">${file}</a>
                 <button type="button" onclick="removeFile(${fileIndex})">Видалити</button>
             </div>
         `).join('')}
@@ -510,7 +510,7 @@ async function updateProduct(productId) {
     }
 
     try {
-        const response = await fetch(`http://127.0.0.1:5000/products/${productId}`, {
+        const response = await fetch(`https://fursik-b40362fa22e8.herokuapp.com/products/${productId}`, {
             method: "PUT",
             body: formData,
         });
@@ -546,7 +546,7 @@ function resetForm() {
 }
 
 function deleteProduct(index) {
-    fetch(`http://127.0.0.1:5000/products/${index}`, {
+    fetch(`https://fursik-b40362fa22e8.herokuapp.com/products/${index}`, {
         method: 'DELETE',
     })
     .then(response => response.json())
@@ -573,12 +573,12 @@ function changeImage(productIndex, direction) {
 
     // Оновлення зображення
     const imgElement = document.querySelector(`#product-${productIndex} .gallery-img`);
-    imgElement.src = `http://127.0.0.1:5000${product.files[newIndex]}`;
+    imgElement.src = `https://fursik-b40362fa22e8.herokuapp.com${product.files[newIndex]}`;
 }
 function clearAllProductsOnServer() {
     if (!confirm('Ви впевнені, що хочете очистити всі товари?')) return;
 
-    fetch('http://127.0.0.1:5000/products', {
+    fetch('https://fursik-b40362fa22e8.herokuapp.com/products', {
         method: 'DELETE'
     })
     .then(response => {
