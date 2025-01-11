@@ -4,7 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="stiladmin.css">
+    <link rel="icon" href="images\DALL·E 2024-12-12 13.58.44 - A sleek and modern emblem for 'FursikUA', an online store. The emblem should feature a circular design with a playful and minimalist fur animal icon (.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
+</head>
      <style>
+        body {
+    font-family: 'Neucha', sans-serif; /* Застосовуємо Neucha як основний шрифт */
+    margin: 0;
+    padding: 0;
+    background-image: url('images/1667341975_13-celes-club-p-kofeinii-tsvet-fon-instagram-13.jpg'); /* Ваш фон */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    font-size: 20px; /* Базовий розмір шрифту */
+    line-height: 0,8; /* Зручний міжрядковий інтервал */
+    color: #333; /* Основний колір тексту */
+}
+
         .image-gallery {
             position: relative;
             display: inline-block;
@@ -76,7 +92,6 @@
 }
 
     </style>
-</head>
 <body>
 
     <!-- Заголовок сайту -->
@@ -84,14 +99,7 @@
 
         <h1><a href="index.html">Інтернет-магазин "FursikUA</a></h1>
     </header>
-    <h2>Завантажити фон для головної сторінки</h2>
-    <form id="upload-background-form">
-        <label for="background-file">Файл зображення:</label>
-        <input type="file" id="background-file" required>
-        <button type="submit">Завантажити</button>
-    </form>    
-    <div id="background-status"></div>
-    <h2>Додати товар</h2>
+        <h2>Додати товар</h2>
     <form id="add-product-form" onsubmit="addProduct(event)">
         <label for="new-name">Назва:</label>
         <input type="text" id="new-name" required>
@@ -105,8 +113,16 @@
         <textarea id="new-description" required></textarea>
         <label for="new-file">Зображення/Відео (файл):</label>
         <input type="file" id="new-file" name="file" multiple>
+        <label for="modifications">Модифікації:</label>
+<div id="modifications-container">
+    <div class="modification-field">
+        <input type="text" name="modification" placeholder="Введіть модифікацію">
+        <button type="button" onclick="addModificationField()">+</button>
+    </div>
+</div>
+
         <button type="submit">Додати товар</button>
-        <button type="button" id="update-button" style="display:none" onclick="updateProduct(event)">Оновити товар</button>
+        <button type="button" id="update-button" style="display:none" onclick="updateProduct(0)">Оновити товар</button>
     </form>
     
     <h2>Пошук товару</h2>
@@ -116,49 +132,27 @@
     <h2>Список товарів</h2>
     <div id="product-list"></div>
 
+    <button onclick="clearAllProductsOnServer()">Очистити всі товари</button>
+
     <div id="status"></div>
-
+</body>
+</html>
     <script>
-document.getElementById('upload-background-form').addEventListener('submit', async function(event) {
-    event.preventDefault();
-
-    const fileInput = document.getElementById('background-file');
-    const formData = new FormData();
-    formData.append('file', fileInput.files[0]);
-
-    try {
-        const response = await fetch('http://127.0.0.1:5000/upload-background', {
-            method: 'POST',
-            body: formData,
-        });
-        const result = await response.json();
-        if (result.success) {
-            document.getElementById('background-status').textContent = 'Фон успішно завантажено!';
-            // Збереження шляху до фону в localStorage
-            const backgroundUrl = `http://127.0.0.1:5000${result.file}`;
-            localStorage.setItem('backgroundImage', backgroundUrl);
-            applyBackground(); // Оновлюємо фон на сторінці
-        } else {
-            document.getElementById('background-status').textContent = result.message;
-        }
-    } catch (error) {
-        console.error('Помилка:', error);
-        document.getElementById('background-status').textContent = 'Помилка на сервері.';
-    }
-});
-
-// Функція для застосування фону на сторінці
-function applyBackground() {
-    const backgroundImage = localStorage.getItem('backgroundImage');
-    if (backgroundImage) {
-        document.body.style.backgroundImage = `url(${backgroundImage})`;
-        document.body.style.backgroundSize = 'cover';
-        document.body.style.backgroundPosition = 'center';
-    }
+function addModificationField() {
+    const container = document.getElementById("modifications-container");
+    const newField = document.createElement("div");
+    newField.className = "modification-field";
+    newField.innerHTML = `
+        <input type="text" name="modification" placeholder="Введіть модифікацію">
+        <button type="button" onclick="removeField(this)">-</button>
+    `;
+    container.appendChild(newField);
 }
 
-// Встановлюємо фон при завантаженні сторінки
-window.onload = applyBackground;
+function removeField(button) {
+    const field = button.parentElement;
+    field.remove();
+}
 
 function searchProductByArticle() {
     const searchValue = document.getElementById('search-article').value.trim().toLowerCase();
@@ -184,6 +178,8 @@ function searchProductByArticle() {
 
 let products = []; // Глобальний масив для зберігання всіх продуктів
 let currentEditingIndex = null; // Індекс товару, який редагується
+let filesToDelete = []; // Глобальний список файлів для видалення
+
 
 async function loadProducts() {
     try {
@@ -225,6 +221,19 @@ function renderProducts(products) {
             }
         }).join('');
 
+        // Додаткове відображення модифікацій як кнопок
+        let modificationsHTML = '';
+        if (product.modifications && product.modifications.length > 0) {
+            modificationsHTML = `
+                <div class="modifications">
+                    <h4>Модифікації:</h4>
+                    ${product.modifications.map(mod => `
+                        <button class="modification-btn" onclick="selectModification('${mod}')">${mod}</button>
+                    `).join('')}
+                </div>
+            `;
+        }
+
         productList.innerHTML += `
             <div id="product-${index}">
                 <h3>${product.name}</h3>
@@ -236,6 +245,7 @@ function renderProducts(products) {
                 <div class="prices">
                     ${oldPriceHTML} ${newPriceHTML}
                 </div>
+                ${modificationsHTML}
                 <button onclick="editProduct(${index})">Редагувати</button>
                 <button onclick="deleteProduct(${index})">Видалити</button>
             </div>
@@ -244,74 +254,144 @@ function renderProducts(products) {
     });
 }
 
+// Додаткова функція для вибору модифікації
+function selectModification(modification) {
+    alert(`Вибрано модифікацію: ${modification}`);
+}
+
 function addProduct(event) {
     event.preventDefault();
 
     const name = document.getElementById("new-name").value;
     const article = document.getElementById("new-article").value;
-    const price = parseFloat(document.getElementById("new-price").value);
-    const oldPrice = parseFloat(document.getElementById("new-old-price").value)|| null;
+    const priceValue = document.getElementById("new-price").value;
+    const oldPriceValue = document.getElementById("new-old-price").value;
     const description = document.getElementById("new-description").value;
     const fileInput = document.getElementById("new-file");
 
+    // Збираємо модифікації з полів
+    const modifications = Array.from(document.querySelectorAll('[name="modification"]'))
+        .map(input => input.value.trim())
+        .filter(modification => modification !== ""); // Виключаємо порожні значення
+
+    // Перевірка, чи ціна є числом
+    if (!priceValue || isNaN(priceValue)) {
+        alert('Будь ласка, введіть коректну ціну.');
+        return;
+    }
+
     const formData = new FormData();
     formData.append('name', name);
-    formData.append('article', article); // Додаємо артикул
-    formData.append('price', price);
-    formData.append('oldPrice', oldPrice);
+    formData.append('article', article);
+    formData.append('price', priceValue);
     formData.append('description', description);
 
+    // Додаємо oldPrice тільки якщо є значення
+    if (oldPriceValue && !isNaN(oldPriceValue)) {
+        formData.append('oldPrice', oldPriceValue);
+    }
+
+    // Додаємо файли
     for (let i = 0; i < fileInput.files.length; i++) {
         formData.append('file', fileInput.files[i]);
     }
+
+    // Додаємо модифікації
+    modifications.forEach(modification => formData.append('modification', modification));
 
     fetch('http://127.0.0.1:5000/upload', {
         method: 'POST',
         body: formData,
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
-            document.getElementById('status').textContent = 'Файл(и) успішно завантажено!';
+            document.getElementById('status').textContent = 'Товар успішно додано!';
             loadProducts();
             document.getElementById("add-product-form").reset();
+            // Очищуємо список модифікацій
+            const modificationContainer = document.getElementById('modifications-container');
+            modificationContainer.innerHTML = `
+                <div class="modification-field">
+                    <input type="text" name="modification" placeholder="Введіть модифікацію">
+                    <button type="button" onclick="addModificationField()">+</button>
+                </div>
+            `;
         } else {
-            document.getElementById('status').textContent = 'Помилка при завантаженні файлу.';
+            document.getElementById('status').textContent = 'Помилка: ' + data.message;
         }
     })
     .catch(error => {
-        document.getElementById('status').textContent = 'Помилка на сервері.';
-        console.error('Error:', error);
+        console.error('Помилка при додаванні товару:', error);
+        document.getElementById('status').textContent = 'Не вдалося додати товар.';
     });
 }
 
 function editProduct(index) {
     const product = products[index];
+
+    // Заповнення форми
     document.getElementById("new-name").value = product.name;
     document.getElementById("new-article").value = product.article;
     document.getElementById("new-price").value = product.price;
     document.getElementById("new-old-price").value = product.oldPrice || ''; // Стара ціна
     document.getElementById("new-description").value = product.description;
 
+    // Очищаємо попередній список файлів
+    const existingFilesContainer = document.getElementById("existing-files");
+    if (existingFilesContainer) {
+        existingFilesContainer.remove();
+    }
+
     // Відображаємо існуючі файли
-    const existingFilesContainer = document.createElement('div');
-    existingFilesContainer.id = "existing-files";
-    existingFilesContainer.innerHTML = `
+    const newFilesContainer = document.createElement('div');
+    newFilesContainer.id = "existing-files";
+    newFilesContainer.setAttribute('data-product-index', index); // Додаємо атрибут для ідентифікації
+    newFilesContainer.innerHTML = `
         <h4>Наявні файли:</h4>
         ${product.files.map((file, fileIndex) => `
-            <div id="file-${fileIndex}">
+            <div id="file-${fileIndex}" data-file-path="${file}">
                 <a href="http://127.0.0.1:5000${file}" target="_blank">${file}</a>
-                <button type="button" onclick="removeFile(${index}, ${fileIndex})">Видалити</button>
+                <button type="button" onclick="removeFile(${fileIndex})">Видалити</button>
             </div>
         `).join('')}
     `;
-    
-    // Додаємо до форми (перед кнопками)
     const form = document.getElementById("add-product-form");
-    form.insertBefore(existingFilesContainer, form.lastElementChild);
+    form.insertBefore(newFilesContainer, form.lastElementChild);
 
-    // Показуємо кнопку оновлення
-    document.getElementById("update-button").style.display = "inline-block";
+    // Очищаємо контейнер модифікацій
+    const modificationsContainer = document.getElementById("modifications-container");
+    modificationsContainer.innerHTML = "";
+
+    // Відображення модифікацій
+    if (product.modifications && product.modifications.length > 0) {
+        product.modifications.forEach(modification => {
+            const modificationField = document.createElement("div");
+            modificationField.className = "modification-field";
+            modificationField.innerHTML = `
+                <input type="text" name="modification" value="${modification}" placeholder="Введіть модифікацію">
+                <button type="button" onclick="removeField(this)">-</button>
+            `;
+            modificationsContainer.appendChild(modificationField);
+        });
+    }
+
+    // Завжди додаємо кнопку для додавання нових модифікацій
+    const addModificationButton = document.createElement("button");
+    addModificationButton.type = "button";
+    addModificationButton.textContent = "Додати модифікацію";
+    addModificationButton.onclick = addModificationField;
+    modificationsContainer.appendChild(addModificationButton);
+
+    // Оновлюємо `productId` у кнопці оновлення
+    const updateButton = document.getElementById("update-button");
+    updateButton.setAttribute("onclick", `updateProduct(${index})`);
+    updateButton.style.display = "inline-block";
     document.querySelector('button[type="submit"]').style.display = "none";
 
     // Зберігаємо індекс редагованого товару
@@ -321,68 +401,141 @@ function editProduct(index) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function removeFile(productIndex, fileIndex) {
-    fetch(`http://127.0.0.1:5000/products/${productIndex}/files/${fileIndex}`, {
-        method: 'DELETE',
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            document.getElementById(`file-${fileIndex}`).remove();
-            products[productIndex].files.splice(fileIndex, 1); // Видаляємо файл із локального списку
-            alert('Файл успішно видалено!');
-        } else {
-            alert('Помилка при видаленні файлу.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Помилка на сервері.');
-    });
+// Функція для додавання нового поля модифікації
+function addModificationField(value = "") {
+    const modificationsContainer = document.getElementById("modifications-container");
+    const modificationField = document.createElement("div");
+    modificationField.className = "modification-field";
+    modificationField.innerHTML = `
+        <input type="text" name="modification" value="${value}" placeholder="Введіть модифікацію">
+        <button type="button" onclick="removeField(this)">-</button>
+    `;
+    modificationsContainer.insertBefore(modificationField, modificationsContainer.lastElementChild);
 }
 
-function updateProduct(event) {
-    event.preventDefault();
+// Функція для видалення поля модифікації
+function removeField(button) {
+    const field = button.parentElement;
+    field.remove();
+}
 
-    const name = document.getElementById("new-name").value;
-    const article = document.getElementById("new-article").value;
-    const price = parseFloat(document.getElementById("new-price").value);
-    const oldPrice = parseFloat(document.getElementById("new-old-price").value) || null;
-    const description = document.getElementById("new-description").value;
-    const fileInput = document.getElementById("new-file");
+// Додаткові функції для роботи з модифікаціями
+function addModificationField() {
+    const modificationsContainer = document.getElementById("modifications-container");
+    const modificationField = document.createElement("div");
+    modificationField.className = "modification-field";
+    modificationField.innerHTML = `
+        <input type="text" name="modification" placeholder="Введіть модифікацію">
+        <button type="button" onclick="removeField(this)">-</button>
+    `;
+    modificationsContainer.appendChild(modificationField);
+}
 
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('article', article);
-    formData.append('price', price);
-    formData.append('oldPrice', oldPrice);
-    formData.append('description', description);
+function removeField(button) {
+    const field = button.parentElement;
+    field.remove();
+}
 
-    // Додаємо нові файли, якщо вони завантажені
-    for (let i = 0; i < fileInput.files.length; i++) {
-        formData.append('file', fileInput.files[i]);
+function removeFile(fileIndex) {
+    const existingFilesContainer = document.getElementById("existing-files");
+    const productIndex = existingFilesContainer.getAttribute('data-product-index'); // Отримуємо правильний індекс товару
+    const filePath = products[productIndex].files[fileIndex];
+
+    // Додаємо файл у список для видалення
+    if (!filesToDelete.includes(filePath)) {
+        filesToDelete.push(filePath);
     }
 
-    // Оновлюємо товар на сервері
-    fetch(`http://127.0.0.1:5000/products/${currentEditingIndex}`, {
-        method: 'PUT',
-        body: formData,
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Товар успішно оновлено!');
-            loadProducts();
-            resetForm();
-        } else {
-            alert('Помилка при оновленні товару.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Помилка на сервері.');
-    });
+    // Видаляємо елемент із DOM
+    const fileElement = document.getElementById(`file-${fileIndex}`);
+    if (fileElement) {
+        fileElement.remove();
+    }
+
+    // Видаляємо файл із локального списку продуктів
+    if (products[productIndex] && products[productIndex].files) {
+        products[productIndex].files.splice(fileIndex, 1);
+    }
+
+    console.log(`Файл додано до списку для видалення: ${filePath}`);
 }
+
+async function updateProduct(productId) {
+    const name = document.getElementById("new-name").value.trim();
+    const article = document.getElementById("new-article").value.trim();
+    const priceInput = document.getElementById("new-price").value.trim();
+    const oldPriceInput = document.getElementById("new-old-price").value.trim();
+    const description = document.getElementById("new-description").value.trim();
+    const fileInput = document.getElementById("new-file");
+
+    // Збираємо модифікації
+    const modifications = Array.from(document.querySelectorAll('[name="modification"]'))
+        .map(input => input.value.trim())
+        .filter(modification => modification !== "");
+
+    // Перевірка обов'язкових полів
+    if (!name || !article || !priceInput || !description) {
+        alert("Будь ласка, заповніть всі обов'язкові поля.");
+        return;
+    }
+
+    let price = parseFloat(priceInput);
+    let oldPrice = oldPriceInput ? parseFloat(oldPriceInput) : null;
+
+    if (isNaN(price) || (oldPriceInput && isNaN(oldPrice))) {
+        alert("Ціна та стара ціна повинні бути числовими значеннями.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("article", article);
+    formData.append("price", price);
+    formData.append("oldPrice", oldPrice !== null ? oldPrice : "null");
+    formData.append("description", description);
+
+    // Передаємо список модифікацій
+    modifications.forEach(modification => formData.append("modification", modification));
+
+    // Передаємо список файлів для видалення
+    filesToDelete.forEach(file => {
+        formData.append("filesToDelete", file);
+    });
+
+    // Додаємо нові файли
+    if (fileInput.files.length > 0) {
+        for (let i = 0; i < fileInput.files.length; i++) {
+            formData.append("file", fileInput.files[i]);
+        }
+    }
+
+    try {
+        const response = await fetch(`http://127.0.0.1:5000/products/${productId}`, {
+            method: "PUT",
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status}`);
+        }
+
+        const result = await response.json();
+        if (result.success) {
+            console.log("Updated product:", result.product);
+            alert("Товар успішно оновлено!");
+            loadProducts(); // Перезавантажуємо список товарів
+            resetForm(); // Скидаємо форму після успішного оновлення
+        } else {
+            alert("Помилка: " + result.message);
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert(`Помилка: ${error.message}`);
+    } finally {
+        filesToDelete = []; // Очищуємо список файлів для видалення після оновлення
+    }
+}
+
 function resetForm() {
     document.getElementById("add-product-form").reset();
     document.getElementById("update-button").style.display = "none";
@@ -422,8 +575,37 @@ function changeImage(productIndex, direction) {
     const imgElement = document.querySelector(`#product-${productIndex} .gallery-img`);
     imgElement.src = `http://127.0.0.1:5000${product.files[newIndex]}`;
 }
+function clearAllProductsOnServer() {
+    if (!confirm('Ви впевнені, що хочете очистити всі товари?')) return;
+
+    fetch('http://127.0.0.1:5000/products', {
+        method: 'DELETE'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Помилка сервера: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log(data.message);
+        clearProducts();
+        alert('Всі товари успішно очищено!');
+    })
+    .catch(error => {
+        console.error('Помилка очищення товарів:', error);
+        alert('Не вдалося очистити товари.');
+    });
+}
+function clearProducts() {
+    const productList = document.getElementById('product-list');
+    productList.innerHTML = '<p>Немає доступних товарів.</p>'; // Показуємо повідомлення про відсутність товарів
+    products = []; // Очищаємо локальний масив
+}
+
 
 document.addEventListener('DOMContentLoaded', loadProducts);
+
 </script>
 
 </body>

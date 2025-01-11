@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Інтернет-магазин "FursikUA"</title>
-    <!-- Підключення CSS -->
+    <link rel="icon" href="images\DALL·E 2024-12-12 13.58.44 - A sleek and modern emblem for 'FursikUA', an online store. The emblem should feature a circular design with a playful and minimalist fur animal icon (.ico" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 </head>
 <body>
 <!-- Заголовок і пошуковий рядок на одному фоні -->
@@ -32,6 +33,7 @@
 <!-- Блок кошика на головній сторінці -->
 <div id="cart-icon" class="cart-icon">
     <img src="https://media.istockphoto.com/id/1206806317/uk/%D0%B2%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%BD%D1%96-%D0%B7%D0%BE%D0%B1%D1%80%D0%B0%D0%B6%D0%B5%D0%BD%D0%BD%D1%8F/%D0%BF%D1%96%D0%BA%D1%82%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%B0-%D0%BA%D0%BE%D1%88%D0%B8%D0%BA%D0%B0-%D0%B4%D0%BB%D1%8F-%D0%BF%D0%BE%D0%BA%D1%83%D0%BF%D0%BE%D0%BA-%D1%96%D0%B7%D0%BE%D0%BB%D1%8C%D0%BE%D0%B2%D0%B0%D0%BD%D0%B0-%D0%BD%D0%B0-%D0%B1%D1%96%D0%BB%D0%BE%D0%BC%D1%83-%D1%82%D0%BB%D1%96.jpg?s=612x612&w=0&k=20&c=ESWl1nO341vdKZK_tIAJkVRc0FNM72OcWXf0K8ePVFw=" alt="Кошик" id="cart-icon-img"> <!-- Ваша картинка кошика -->
+    <span id="cart-count" class="cart-count">0</span>
     <div id="cart-details" class="cart-details">
         <h3>Ваш кошик</h3>
         <div id="cart-items"></div>
@@ -47,7 +49,6 @@
     <div class="header-left">
     <!-- Основне меню -->
     <div class="nav-bar vertical">
-        <a href="index.html">Головна</a>
         <div class="dropdown">
             <a href="#">Каталог товарів</a>
             <div class="dropdown-content">
@@ -92,6 +93,10 @@
 </div>
 <button id="scroll-to-top" class="scroll-to-top">↑</button>
 
+<div class="view-toggle-container">
+    <button id="view-toggle-btn" onclick="toggleView()">Змінити вид</button>
+</div>
+
 <div class="product-grid" id="product-list">
     <!-- Продукти будуть додані через JavaScript -->
 </div>
@@ -102,8 +107,9 @@
         <h2 id="detail-product-name"></h2>
         <div id="detail-product-gallery"></div>
         <p id="detail-product-description"></p>
+        <div id="detail-product-modifications" class="modifications-container"></div>
         <p id="detail-product-price"></p>
-        <button onclick="addToCartFromDetailModal()">Додати в кошик</button>
+        <button onclick="addToCartFromDetailModal(this)">Додати в кошик</button>
     </div>
 </div>
 

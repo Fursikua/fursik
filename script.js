@@ -115,24 +115,54 @@ function updateCartDisplay() {
     }
 }
 
-function addToCart(article) {
+function updateCartCount() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || { items: [], total: 0 };
+    const cartCount = cart.items.reduce((count, item) => count + item.quantity, 0);
+    document.getElementById('cart-count').textContent = cartCount;
+}
+
+
+function addToCart(article, modification = null) {
     const product = products.find(product => product.article === article);
     if (!product) return;
 
+    // Перевірка: якщо товар має модифікації, але модифікацію не передано
+    if (product.modifications && product.modifications.length > 0 && !modification) {
+        // Display the pointing hand and message
+        const detailButton = document.querySelector(`[onclick="openProductDetailModal('${article}')"]`);
+        if (detailButton) {
+            // Check if the notification already exists
+            let notification = detailButton.parentElement.querySelector('.modification-notification');
+            if (!notification) {
+                notification = document.createElement('div');
+                notification.classList.add('modification-notification');
+                notification.innerHTML = `
+                    <span>👉</span> <span>Виберіть модифікацію</span>
+                `;
+                detailButton.parentElement.appendChild(notification);
+
+                // Automatically remove the notification after 3 seconds
+                setTimeout(() => notification.remove(), 3000);
+            }
+        }
+        return;
+    }
+
     let cart = JSON.parse(localStorage.getItem('cart')) || { items: [], total: 0 };
 
-    const existingProduct = cart.items.find(item => item.article === product.article);
+    const existingProduct = cart.items.find(item => item.article === product.article && item.modification === modification);
     if (existingProduct) {
         existingProduct.quantity += 1;
     } else {
-        product.quantity = 1;
-        cart.items.push(product);
+        const newProduct = { ...product, quantity: 1, modification }; // Додаємо модифікацію
+        cart.items.push(newProduct);
     }
 
     cart.total = cart.items.reduce((total, item) => total + item.price * item.quantity, 0);
 
     localStorage.setItem('cart', JSON.stringify(cart));
     updateCartDisplay();
+    updateCartCount();
 }
 
 function removeFromCart(article) {
@@ -145,8 +175,15 @@ function removeFromCart(article) {
 
         localStorage.setItem('cart', JSON.stringify(cart));
         updateCartDisplay();
+        updateCartCount(); // Оновлюємо лічильник
     }
 }
+
+// Оновлюйте лічильник при завантаженні сторінки
+window.onload = function () {
+    updateCartDisplay();
+    updateCartCount(); // Додаємо виклик лічильника
+};
 
 function goToCart() {
     window.location.href = 'cart.html';
@@ -156,18 +193,29 @@ function clearCart() {
     localStorage.removeItem('cart');
     updateCartDisplay();
 }
+function addModificationField() {
+    const container = document.getElementById("modifications-container");
+    const newField = document.createElement("div");
+    newField.className = "modification-field";
+    newField.innerHTML = `
+        <input type="text" name="modification" placeholder="Введіть модифікацію">
+        <button type="button" onclick="removeField(this)">-</button>
+    `;
+    container.appendChild(newField);
+}
 
-window.onload = function () {
-    updateCartDisplay();
-};
+function removeField(button) {
+    const field = button.parentElement;
+    field.remove();
+}
 
 function openProductDetailModal(article) {
     // Знайдемо товар за артикулом
     const product = products.find(product => product.article === article);
-    if (!product) return; // Якщо товар не знайдений, нічого не робимо
+    if (!product) return;
 
     const productModal = document.getElementById('productDetailModal');
-    
+
     // Заповнення інформації про товар
     document.getElementById('detail-product-name').innerText = product.name;
     document.getElementById('detail-product-description').innerText = product.description;
@@ -179,38 +227,128 @@ function openProductDetailModal(article) {
         const fileUrl = `http://127.0.0.1:5000/${file}`;
 
         if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-            return `<img src="${fileUrl}" alt="${product.name}">`;
+            return `<img src="${fileUrl}" alt="${product.name}" class="gallery-img">`;
         } else if (['mp4', 'avi', 'webm'].includes(fileExtension)) {
-            return `<video controls>
+            return `<video controls class="gallery-video">
                         <source src="${fileUrl}" type="video/${fileExtension}">
                     </video>`;
         } else {
             return `<a href="${fileUrl}" target="_blank">Переглянути файл</a>`;
         }
     }).join('');
-
     document.getElementById('detail-product-gallery').innerHTML = gallery;
+
+    // Відображення модифікацій
+    const modificationsContainer = document.getElementById('detail-product-modifications');
+    if (product.modifications && product.modifications.length > 0) {
+        const modificationsHTML = product.modifications.map(mod => `
+            <button class="modification-btn" onclick="selectProductModification('${mod}', this)">${mod}</button>
+        `).join('');
+        modificationsContainer.innerHTML = modificationsHTML;
+    } else {
+        modificationsContainer.innerHTML = '<p>Модифікації недоступні</p>';
+    }
 
     // Відображення модального вікна
     productModal.style.display = 'flex';
     productModal.classList.add('active');
-    // Зберігаємо індекс товару для функції "Додати в кошик"
+
+    // Зберігаємо артикул товару для функції "Додати в кошик"
     window.currentDetailModalProductArticle = product.article;
+    window.currentSelectedModification = null; // Скидаємо вибрану модифікацію
+}
+
+// Функція для вибору модифікації
+function selectProductModification(modification, button) {
+    // Знімаємо активність з усіх кнопок
+    const buttons = document.querySelectorAll('.modification-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+
+    // Застосовуємо активний стиль до вибраної кнопки
+    button.classList.add('active');
+
+    // Зберігаємо вибрану модифікацію
+    window.currentSelectedModification = modification;
 }
 // Функція закриття модального вікна
 function closeProductDetailModal() {
-    document.getElementById('productDetailModal').classList.remove('active');
+    const productModal = document.getElementById('productDetailModal');
+    productModal.classList.remove('active');
+    productModal.style.display = 'none';
 }
-function addToCartFromDetailModal() {
-    const article = window.currentDetailModalProductArticle; // Використовуємо артикул з модального вікна
+function animateAddToCart(button) {
+    // Знаходимо позиції кнопки та іконки кошика
+    const cartIcon = document.getElementById('cart-icon-img');
+    const cartIconRect = cartIcon.getBoundingClientRect();
+    const buttonRect = button.getBoundingClientRect();
+
+    // Створюємо літаючий елемент
+    const flyingItem = document.createElement('div');
+    flyingItem.classList.add('flying-item');
+    document.body.appendChild(flyingItem);
+
+    // Встановлюємо початкову позицію літаючого елемента
+    flyingItem.style.left = buttonRect.left + (buttonRect.width / 2) + 'px';
+    flyingItem.style.top = buttonRect.top + (buttonRect.height / 2) + 'px';
+
+    // Розраховуємо зміщення
+    const deltaX = cartIconRect.left + (cartIconRect.width / 2) - (buttonRect.left + (buttonRect.width / 2));
+    const deltaY = cartIconRect.top + (cartIconRect.height / 2) - (buttonRect.top + (buttonRect.height / 2));
+
+    // Налаштовуємо анімацію
+    flyingItem.animate([
+        { transform: 'translate(0, 0)', opacity: 1 },
+        { transform: `translate(${deltaX}px, ${deltaY}px)`, opacity: 0.5 }
+    ], {
+        duration: 800,
+        easing: 'ease-in-out'
+    });
+
+    // Видаляємо літаючий елемент після завершення анімації
+    setTimeout(() => {
+        flyingItem.remove();
+        // Додаємо ефект підстрибування до іконки кошика
+        cartIcon.classList.add('bounce');
+        setTimeout(() => {
+            cartIcon.classList.remove('bounce');
+        }, 500);
+    }, 800);
+}
+
+// Функція додавання товару до кошика з перевіркою модифікацій
+function addToCartFromDetailModal(button) {
+    const article = window.currentDetailModalProductArticle;
+    const selectedModification = window.currentSelectedModification;
+
+    // Перевірка наявності модифікацій та вибору
+    const product = products.find(product => product.article === article);
+    if (product.modifications && product.modifications.length > 0 && !selectedModification) {
+        // Display the pointing hand and message
+        const modalContent = button.parentElement; // Parent element inside the modal
+        let notification = modalContent.querySelector('.modification-notification');
+
+        // Check if the notification already exists
+        if (!notification) {
+            notification = document.createElement('div');
+            notification.classList.add('modification-notification');
+            notification.innerHTML = `
+                <span>👉</span> <span>Виберіть модифікацію</span>
+            `;
+            modalContent.appendChild(notification);
+
+            // Automatically remove the notification after 3 seconds
+            setTimeout(() => notification.remove(), 3000);
+        }
+        return;
+    }
+
+    // Додаємо товар до кошика
     if (article) {
-        addToCart(article); // Додаємо товар в кошик за артикулом
-        alert('Товар додано в кошик');
+        addToCart(article, selectedModification);
+        animateAddToCart(button);
         closeProductDetailModal();
     }
 }
-
-
 let products = [];
 
 async function loadProducts() {
@@ -243,21 +381,14 @@ function renderProducts(products) {
 
             if (['mp4', 'mov', 'avi', 'webm'].includes(fileExtension)) {
                 return `
-                    <video data-file-index="${fileIndex}" class="media-file" controls style="width:300px; height:300px; display: ${fileIndex === 0 ? 'block' : 'none'};">
+                    <video data-file-index="${fileIndex}" class="media-file" controls  display: ${fileIndex === 0 ? 'block' : 'none'};">
                         <source src="${fileUrl}" type="video/${fileExtension}">
                         Ваш браузер не підтримує відтворення цього відео.
                     </video>
                 `;
             } else if (['jpg', 'jpeg', 'png', 'gif', 'bmp'].includes(fileExtension)) {
                 return `
-                    <img data-file-index="${fileIndex}" class="media-file" src="${fileUrl}" style="width:300px; height:300px; display: ${fileIndex === 0 ? 'block' : 'none'};" alt="${product.name}">
-                `;
-            } else if (['mp3', 'wav', 'ogg'].includes(fileExtension)) {
-                return `
-                    <audio data-file-index="${fileIndex}" class="media-file" controls style="width:300px; height:50px; display: ${fileIndex === 0 ? 'block' : 'none'};">
-                        <source src="${fileUrl}" type="audio/${fileExtension}">
-                        Ваш браузер не підтримує відтворення цього аудіофайлу.
-                    </audio>
+                    <img data-file-index="${fileIndex}" class="media-file" src="${fileUrl}"  display: ${fileIndex === 0 ? 'block' : 'none'};" alt="${product.name}">
                 `;
             } else {
                 return `<a href="${fileUrl}" target="_blank" class="media-file" style="display: ${fileIndex === 0 ? 'block' : 'none'};">Переглянути файл</a>`;
@@ -266,8 +397,8 @@ function renderProducts(products) {
 
         const navigationButtons = product.files.length > 1
             ? `
-                <button onclick="changeMedia(${index}, -1)">Назад</button>
-                <button onclick="changeMedia(${index}, 1)">Далі</button>
+                <button class="navigation-btn" onclick="changeMedia(${index}, -1)">Назад</button>
+                <button class="navigation-btn" onclick="changeMedia(${index}, 1)">Далі</button>
             `
             : '';
 
@@ -275,18 +406,19 @@ function renderProducts(products) {
             <div class="product-item">
                 <h3>${product.name}</h3>
                 <p>Артикул: ${product.article}</p>
-                <div id="media-${index}" class="image-gallery">${gallery}</div>
+                <div id="media-${index}" class="image-gallery" data-product-index="${index}">${gallery}</div>
                 ${navigationButtons}
                 <p id="description-${index}">${shortDescription}</p>
                 <button onclick="openProductDetailModal('${product.article}')">Детальніше</button>
                 <div class="prices">
                     ${oldPriceHTML} ${newPriceHTML}
                 </div>
-                <button onclick="addToCart('${product.article}')">Додати в кошик</button>            </div>
+                <button onclick="addToCart('${product.article}')">Додати в кошик</button>
+            </div>
         `;
-
-        enableSwipe(index); // Додаємо підтримку свайпів для цього товару
     });
+
+    enableSwipe(); // Додаємо підтримку свайпів для всіх товарів
 }
 
 function addProduct(event) {
@@ -327,53 +459,93 @@ function addProduct(event) {
 }
 
 function changeMedia(productIndex, direction) {
-    const product = products[productIndex];
-    if (!product || !product.files.length) return;
-
-    // Отримуємо всі медіа елементи для цього товару
-    const mediaElements = document.querySelectorAll(`#media-${productIndex} .media-file`);
-
-    // Знаходимо індекс поточного видимого елемента
-    let currentIndex = Array.from(mediaElements).findIndex(el => el.style.display === 'block');
-
-    // Якщо поточного елемента не знайдено, почнемо з першого
-    if (currentIndex === -1) {
-        currentIndex = 0;
-    }
-
-    // Обчислюємо новий індекс
-    let newIndex = (currentIndex + direction + product.files.length) % product.files.length;
-
-    // Оновлюємо видимість медіафайлів
-    mediaElements.forEach((el, index) => {
-        el.style.display = index === newIndex ? 'block' : 'none'; // Показуємо/ховаємо елементи
-    });
-}
-function enableSwipe(productIndex) {
-    const mediaContainer = document.getElementById(`media-${productIndex}`);
+    const mediaContainer = document.querySelector(`.image-gallery[data-product-index="${productIndex}"]`);
     if (!mediaContainer) return;
 
-    let startX = 0; // Початкова координата X
-    let endX = 0; // Кінцева координата X
+    const mediaFiles = mediaContainer.querySelectorAll('.media-file');
+    const currentFileIndex = Array.from(mediaFiles).findIndex(file => file.style.display === 'block');
 
-    // Початок свайпу
-    mediaContainer.addEventListener('touchstart', (e) => {
-        startX = e.touches[0].clientX;
+    // Обчислюємо наступний індекс
+    let nextFileIndex = currentFileIndex + direction;
+    if (nextFileIndex < 0) nextFileIndex = mediaFiles.length - 1;
+    if (nextFileIndex >= mediaFiles.length) nextFileIndex = 0;
+
+    // Оновлюємо відображення файлів
+    mediaFiles.forEach((file, index) => {
+        file.style.display = index === nextFileIndex ? 'block' : 'none';
     });
+}
+function toggleView() {
+    const productGrid = document.getElementById('product-list');
+    const toggleBtn = document.getElementById('view-toggle-btn');
 
-    // Завершення свайпу
-    mediaContainer.addEventListener('touchend', (e) => {
-        endX = e.changedTouches[0].clientX;
+    // Перемикання класу для контейнера продуктів
+    if (productGrid.classList.contains('two-columns')) {
+        productGrid.classList.remove('two-columns');
+        toggleBtn.textContent = 'Змінити вид'; // Оновлюємо текст кнопки
+    } else {
+        productGrid.classList.add('two-columns');
+        toggleBtn.textContent = 'Повернути стандартний вигляд';
+    }
+}
+document.addEventListener("DOMContentLoaded", function () {
+    const toggleButton = document.getElementById("view-toggle-btn");
+    const originalOffsetTop = toggleButton.offsetTop; // Початкове положення кнопки
 
-        // Визначаємо напрямок свайпу
-        const swipeDistance = endX - startX;
-        if (swipeDistance > 50) {
-            // Свайп вправо (назад)
-            changeMedia(productIndex, -1);
-        } else if (swipeDistance < -50) {
-            // Свайп вліво (вперед)
-            changeMedia(productIndex, 1);
+    window.addEventListener("scroll", function () {
+        if (window.scrollY > originalOffsetTop) {
+            toggleButton.classList.add("fixed");
+        } else {
+            toggleButton.classList.remove("fixed");
         }
+    });
+});
+
+function hideNavigationButtonsForTouchDevices() {
+    // Перевірка на сенсорний пристрій
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+    if (isTouchDevice) {
+        // Знаходимо всі кнопки "Назад" і "Далі"
+        const navigationButtons = document.querySelectorAll('.navigation-btn');
+
+        // Додаємо клас для приховування
+        navigationButtons.forEach(button => {
+            button.classList.add('touch-hidden');
+        });
+    }
+}
+
+// Викликаємо функцію після завантаження сторінки
+document.addEventListener('DOMContentLoaded', hideNavigationButtonsForTouchDevices);
+window.addEventListener('resize', hideNavigationButtonsForTouchDevices);
+
+function enableSwipe() {
+    const allMediaContainers = document.querySelectorAll('.image-gallery'); // Отримуємо всі галереї
+
+    allMediaContainers.forEach((mediaContainer) => {
+        let startX = 0;
+        let endX = 0;
+        const productIndex = mediaContainer.getAttribute('data-product-index'); // Отримуємо індекс продукту
+
+        // Початок свайпу
+        mediaContainer.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+        });
+
+        // Завершення свайпу
+        mediaContainer.addEventListener('touchend', (e) => {
+            endX = e.changedTouches[0].clientX;
+
+            const swipeDistance = endX - startX;
+            if (swipeDistance > 50) {
+                // Свайп вправо (назад)
+                changeMedia(productIndex, -1);
+            } else if (swipeDistance < -50) {
+                // Свайп вліво (вперед)
+                changeMedia(productIndex, 1);
+            }
+        });
     });
 }
 
@@ -505,18 +677,6 @@ document.querySelectorAll('.nav-bar a').forEach(anchor => {
     });
 });
 
-// Функція для застосування фону на головній сторінці
-function applyBackground() {
-    const backgroundImage = localStorage.getItem('backgroundImage');
-    if (backgroundImage) {
-        document.body.style.backgroundImage = `url(${backgroundImage})`;
-        document.body.style.backgroundSize = 'cover'; // Дозволяє фону покривати всю площу екрану
-        document.body.style.backgroundPosition = 'center'; // Встановлює фон по центру
-    }
-}
-
-// Викликаємо applyBackground, щоб застосувати фон, коли сторінка завантажена
-window.onload = applyBackground;
 // Додати функцію для кнопки прокрутки догори
 document.addEventListener("DOMContentLoaded", function () {
     const scrollToTopBtn = document.getElementById("scroll-to-top");
@@ -550,5 +710,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     updateCartDisplay();
 });
-
 
