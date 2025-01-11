@@ -224,7 +224,7 @@ function openProductDetailModal(article) {
     // Галерея зображень або відео
     const gallery = product.files.map(file => {
         const fileExtension = file.split('.').pop().toLowerCase();
-        const fileUrl = `http://127.0.0.1:5000/${file}`;
+        const fileUrl = `https://fursik-b40362fa22e8.herokuapp.com/${file}`;
 
         if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
             return `<img src="${fileUrl}" alt="${product.name}" class="gallery-img">`;
@@ -353,7 +353,7 @@ let products = [];
 
 async function loadProducts() {
     try {
-        const response = await fetch('http://127.0.0.1:5000/products');
+        const response = await fetch('https://fursik-b40362fa22e8.herokuapp.com/products');
         if (!response.ok) throw new Error('Помилка завантаження товарів');
         products = await response.json();
         renderProducts(products);
@@ -377,7 +377,7 @@ function renderProducts(products) {
 
         const gallery = product.files.map((file, fileIndex) => {
             const fileExtension = file.split('.').pop().toLowerCase();
-            const fileUrl = `http://127.0.0.1:5000/${file}`;
+            const fileUrl = `https://fursik-b40362fa22e8.herokuapp.com/${file}`;
 
             if (['mp4', 'mov', 'avi', 'webm'].includes(fileExtension)) {
                 return `
@@ -438,7 +438,7 @@ function addProduct(event) {
         formData.append('file', fileInput.files[i]);
     }
 
-    fetch('http://127.0.0.1:5000/upload', {
+    fetch('https://fursik-b40362fa22e8.herokuapp.com/upload', {
         method: 'POST',
         body: formData,
     })
@@ -593,7 +593,7 @@ async function renderPromoProducts() {
     const promoWrapper = promoSection.querySelector('.promo-products-wrapper');
     
     try {
-        const response = await fetch('http://127.0.0.1:5000/products');
+        const response = await fetch('https://fursik-b40362fa22e8.herokuapp.com/products');
         if (!response.ok) throw new Error('Помилка завантаження товарів');
 
         const products = await response.json();
@@ -611,7 +611,7 @@ async function renderPromoProducts() {
 
             const gallery = product.files.map((file, fileIndex) => {
                 const fileExtension = file.split('.').pop().toLowerCase();
-                const fileUrl = `http://127.0.0.1:5000/${file}`;
+                const fileUrl = `https://fursik-b40362fa22e8.herokuapp.com/${file}`;
 
                 if (['mp4', 'mov', 'avi'].includes(fileExtension)) {
                     return `
