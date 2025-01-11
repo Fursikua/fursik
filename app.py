@@ -61,6 +61,13 @@ def index():
 @app.route('/<path:path>')
 def static_files(path):
     return send_from_directory('.', path)
+@app.route('/your-route', methods=['OPTIONS'])
+def handle_options():
+    response = jsonify({'status': 'OK'})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+    return response
 
 # Додано збереження артикула
 @app.route('/upload', methods=['POST'])
