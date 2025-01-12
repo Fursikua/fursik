@@ -163,6 +163,27 @@ function addToCart(article, modification = null) {
     updateCartDisplay();
     updateCartCount();
 }
+document.addEventListener('DOMContentLoaded', () => {
+    loadProducts().then(() => {
+        // Enable "Додати в кошик" buttons only after products are loaded
+        const addToCartButtons = document.querySelectorAll('.add-to-cart-button');
+        addToCartButtons.forEach(button => button.disabled = false);
+    });
+});
+
+function addToCartWithModification(article) {
+    const modificationSelect = document.getElementById('modification-select');
+    const selectedModification = modificationSelect ? modificationSelect.value : null;
+
+    if (!selectedModification) {
+        alert('Будь ласка, виберіть модифікацію.');
+        return;
+    }
+
+    addToCart(article, selectedModification);
+    alert('Товар додано до кошика!');
+}
+
 
 function removeFromCart(article) {
     const cart = JSON.parse(localStorage.getItem('cart')) || { items: [], total: 0 };
@@ -208,64 +229,6 @@ function removeField(button) {
     field.remove();
 }
 
-function openProductDetailModal(article) {
-    // Знайдемо товар за артикулом
-    const product = products.find(product => product.article === article);
-    if (!product) return;
-
-    const productModal = document.getElementById('productDetailModal');
-
-    // Заповнення інформації про товар
-    document.getElementById('detail-product-name').innerText = product.name;
-    document.getElementById('detail-product-description').innerText = product.description;
-    document.getElementById('detail-product-price').innerText = `${product.price} грн`;
-
-    // Галерея зображень або відео
-    const gallery = product.files.map(file => {
-        const fileExtension = file.split('.').pop().toLowerCase();
-        const fileUrl = `https://fursik-b40362fa22e8.herokuapp.com/${file}?t=${Date.now()}`; // Додаємо унікальний параметр
-
-        if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-            return `<img src="${fileUrl}" alt="${product.name}" class="gallery-img" style="display: none;" onload="this.style.display='block';">`;
-        } else if (['mp4', 'avi', 'webm'].includes(fileExtension)) {
-            return `<video controls class="gallery-video">
-                        <source src="${fileUrl}" type="video/${fileExtension}">
-                        Ваш браузер не підтримує відтворення цього відео.
-                    </video>`;
-        } else {
-            return `<a href="${fileUrl}" target="_blank">Переглянути файл</a>`;
-        }
-    }).join('');
-    
-    const galleryContainer = document.getElementById('detail-product-gallery');
-    galleryContainer.innerHTML = gallery;
-
-    // Перевірка завантаження зображень
-    const images = galleryContainer.querySelectorAll('.gallery-img');
-    images.forEach(img => {
-        img.style.display = 'none';
-        img.onload = () => img.style.display = 'block';
-    });
-
-    // Відображення модифікацій
-    const modificationsContainer = document.getElementById('detail-product-modifications');
-    if (product.modifications && product.modifications.length > 0) {
-        const modificationsHTML = product.modifications.map(mod => `
-            <button class="modification-btn" onclick="selectProductModification('${mod}', this)">${mod}</button>
-        `).join('');
-        modificationsContainer.innerHTML = modificationsHTML;
-    } else {
-        modificationsContainer.innerHTML = '<p>Модифікації недоступні</p>';
-    }
-
-    // Відображення модального вікна
-    productModal.style.display = 'flex';
-    productModal.classList.add('active');
-
-    // Зберігаємо артикул товару для функції "Додати в кошик"
-    window.currentDetailModalProductArticle = product.article;
-    window.currentSelectedModification = null; // Скидаємо вибрану модифікацію
-}
 
 // Функція для вибору модифікації
 function selectProductModification(modification, button) {
@@ -362,15 +325,19 @@ let products = [];
 
 async function loadProducts() {
     try {
-        const response = await fetch('https://fursik-b40362fa22e8.herokuapp.com/products');
-        if (!response.ok) throw new Error('Помилка завантаження товарів');
-        products = await response.json();
-        renderProducts(products);
+        const response = await fetch('/products'); // Replace with your API endpoint
+        if (!response.ok) throw new Error('Failed to load products');
+        products = await response.json(); // Populate the products array
+        renderProducts(products); // Render products on the page
     } catch (error) {
-        console.error('Помилка завантаження:', error);
-        document.getElementById('product-list').innerHTML = '<p>Помилка завантаження товарів</p>';
+        console.error('Error loading products:', error);
     }
 }
+
+// Call this when the page is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    loadProducts();
+});
 
 // Відображення товарів
 function renderProducts(products) {
@@ -404,6 +371,20 @@ function renderProducts(products) {
             }
         }).join('');
 
+                // Додаткове відображення модифікацій як кнопок
+                let modificationsHTML = '';
+                if (product.modifications && product.modifications.length > 0) {
+                    modificationsHTML = `
+                        <div class="modifications">
+                            <h4>Модифікації:</h4>
+                            ${product.modifications.map(mod => `
+                                <button class="modification-btn" onclick="selectModification('${mod}')">${mod}</button>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+        
+
         const navigationButtons = product.files.length > 1
             ? `
                 <button class="navigation-btn" onclick="changeMedia(${index}, -1)">Назад</button>
@@ -421,6 +402,7 @@ function renderProducts(products) {
                 ${navigationButtons}
                 <p id="description-${index}">${shortDescription}</p>
                 <button onclick="openProductDetailModal('${product.article}')">Детальніше</button>
+                ${modificationsHTML}
                 <div class="prices">
                     ${oldPriceHTML} ${newPriceHTML}
                 </div>

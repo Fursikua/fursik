@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ product.name }} - Купити за {{ product.price }} грн</title>
     <title>Інтернет-магазин "FursikUA"</title>
-    <link rel="icon" href="images\DALL·E 2024-12-12 13.58.44 - A sleek and modern emblem for 'FursikUA', an online store. The emblem should feature a circular design with a playful and minimalist fur animal icon (.ico" type="image/x-icon">
+    <link rel="icon" href="/images\DALL·E 2024-12-12 13.58.44 - A sleek and modern emblem for 'FursikUA', an online store. The emblem should feature a circular design with a playful and minimalist fur animal icon (.ico" type="image/x-icon">
     <meta name="description" content="{{ product.description }}">
     <meta name="keywords" content="{{ product.name }}, купити, {{ product.article }}">
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/pstyle.css">
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -16,13 +16,13 @@
     <div class="main-header">
         <!-- Фото ліворуч -->
         <div class="logo-container">
-            <img src="images/FursikUA_Emblem.jpg" alt="FursikUA Logo" class="logo">
+            <img src="/images/FursikUA_Emblem.jpg" alt="FursikUA Logo" class="logo">
         </div>
         <!-- Інші елементи праворуч -->
         <div class="content-container">
             <div class="site-logo">
                 <div class="logo-icon"></div>
-                <a href="index.html">Інтернет-магазин "FursikUA"</a>
+                <a href="/index.html">Інтернет-магазин "FursikUA"</a>
             </div>
             <!-- Пошуковий рядок -->
             <div class="search-bar">
@@ -93,17 +93,25 @@
             </div>
         </section>
 
-    <main>
-        <section class="product-info">
-            <p><strong>Опис:</strong> {{ product.description }}</p>
-            <p><strong>Артикул:</strong> {{ product.article }}</p>
-            <p><strong>Ціна:</strong> {{ product.price }} грн</p>
-        </section>
+        <!-- Dropdown for modifications -->
+        <div id="modifications-container">
+            <label for="modification-select">Оберіть модифікацію:</label>
+            <select id="modification-select">
+                {% for mod in product.modifications %}
+                    <option value="{{ mod }}">{{ mod }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    
+        <!-- Add to Cart Button -->
+        <button onclick="addToCartWithModification('{{ product.article }}')">Додати в кошик</button>
+                <a href="/" class="back-link">Повернутися до головної</a>
+
 </div>
 </header>
-        <a href="/" class="back-link">Повернутися до головної</a>
+
     </main>
-    <script src="/static/script.js"></script>
+    <script src="/pscript.js"></script>
 <section id="promo-products">
     <h2>Акційні товари</h2>
     <div class="promo-products-container">
