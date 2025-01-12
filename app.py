@@ -258,6 +258,24 @@ def delete_product(product_id):
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
+from flask import render_template
+
+@app.route('/product/<string:slug>')
+def product_page(slug):
+    # Знаходимо товар за slug
+    product = next((p for p in products if slug == generate_slug(p)), None)
+    if not product:
+        return "Товар не знайдено", 404
+
+    # Використовуємо HTML-шаблон для створення сторінки
+    return render_template('product.html', product=product)
+
+def generate_slug(product):
+    """Генеруємо SEO-дружній URL"""
+    name_part = secure_filename(product['name']).replace('_', '-').lower()
+    return f"{product['article']}-{name_part}"
+
+
 if __name__ == '__main__':
     # Перевіряємо, чи існує папка для завантажень
     if not os.path.exists(UPLOAD_FOLDER):

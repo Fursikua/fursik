@@ -1,4 +1,3 @@
-
 const productGrid = document.querySelector('.product-grid');
 
 // Відображення модального вікна при натисканні на кнопку "Вхід"
