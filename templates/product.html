@@ -112,6 +112,17 @@
 
     </main>
     <script src="/pscript.js"></script>
+    <script>
+        // Load cart data from localStorage and pass it to the server or UI
+        const cartData = JSON.parse(localStorage.getItem('cart')) || { items: [], total: 0 };
+    
+        // Update cart display with initial data
+        updateCartDisplay();
+    
+        // Log cart data for debugging (optional)
+        console.log("Initial cart data:", cartData);
+    </script>
+    
 <section id="promo-products">
     <h2>Акційні товари</h2>
     <div class="promo-products-container">

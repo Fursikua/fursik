@@ -258,7 +258,7 @@ def delete_product(product_id):
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-from flask import render_template
+from flask import render_template, request
 
 @app.route('/product/<string:slug>')
 def product_page(slug):
@@ -267,8 +267,18 @@ def product_page(slug):
     if not product:
         return "Товар не знайдено", 404
 
+    # Отримуємо дані кошика з localStorage через куки (якщо використовуються)
+    cart_data = request.cookies.get('cart')
+    if cart_data:
+        try:
+            cart_data = json.loads(cart_data)
+        except json.JSONDecodeError:
+            cart_data = {'items': [], 'total': 0}
+    else:
+        cart_data = {'items': [], 'total': 0}
+
     # Використовуємо HTML-шаблон для створення сторінки
-    return render_template('product.html', product=product)
+    return render_template('product.html', product=product, cart=cart_data)
 
 def generate_slug(product):
     """Генеруємо SEO-дружній URL"""

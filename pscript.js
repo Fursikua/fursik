@@ -206,7 +206,7 @@ window.onload = function () {
 };
 
 function goToCart() {
-    window.location.href = 'cart.html';
+    window.location.href = '/cart.html';
 }
 
 function clearCart() {
