@@ -284,13 +284,15 @@ display: block;
     flex-wrap: wrap;
     justify-content: center;
     padding: 10px;
+    gap: 5px; /* Відстань між товарами */
+
 }
 
 .product-item {
     background-color: white;
-    border: 1px solid #ddd;
+    border: 5px solid #ddd;
     border-radius: 8px;
-    padding: 15px;
+    padding: 5px;
     width: clamp(150px, 20vw, 300px);
     text-align: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -304,14 +306,22 @@ display: block;
 /* Галерея медіафайлів */
 .image-gallery {
     position: relative;
-    margin-bottom: 15px;
     width: 100%; /* Контейнер займає всю ширину продукту */
-    aspect-ratio: 16 / 9; /* Зберігаємо співвідношення сторін */
-    overflow: hidden; /* Ховаємо все, що виходить за межі контейнера */
+    aspect-ratio: 16 / 16; /* Співвідношення сторін */
+    overflow: hidden; /* Приховуємо все, що виходить за межі контейнера */
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: #f4f4f4; /* Фон контейнера */
+    transition: transform 0.3s ease-in-out;
+}
+
+.image-gallery img {
+    width: auto; /* Зберігаємо пропорції ширини */
+    height: auto; /* Зберігаємо пропорції висоти */
+    max-width: 100%; /* Обмежуємо максимальний розмір зображення */
+    max-height: 100%; /* Обмежуємо висоту зображення */
+    object-fit: contain; /* Відображення повного зображення без обрізання */
 }
 /* Приховуємо кнопки навігації для мобільних пристроїв */
 @media (max-width: 768px) {
@@ -327,8 +337,17 @@ display: block;
     max-height: 100%;
     object-fit: contain; /* Забезпечує масштабування без обрізання */
     display: none; /* Ховаємо всі файли за замовчуванням */
-    transition: transform 0.3s ease-in-out;
-}
+    transition: opacity 0.3s ease, transform 0.3s ease-in-out;}
+
+    .media-file.active {
+        opacity: 1;
+        transform: scale(1);
+    }
+    
+    .media-file.inactive {
+        opacity: 0;
+        transform: scale(0.9);
+    }
 
 /* Відображення першого файлу */
 .media-file:first-of-type {
@@ -363,15 +382,6 @@ display: block;
     }
 }
 
-@media (max-width: 480px) {
-    .product-item {
-        width: clamp(100px, 30vw, 200px);
-    }
-
-    .image-gallery {
-        aspect-ratio: 1 / 1; /* Змінюємо співвідношення сторін для малих екранів */
-    }
-}
 .modification-notification {
     display: flex;
     align-items: center;
@@ -627,23 +637,6 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-}
-/* Темна тема */
-@media (prefers-color-scheme: dark) {
-    body {
-        background-color: #121212;
-        color: #fff;
-    }
-
-    .product-item {
-        background-color: #1e1e1e;
-        border: 1px solid #333;
-    }
-
-    #search-input {
-        background-color: #1e1e1e;
-        color: white;
-    }
 }
 
 /* Адаптивність */

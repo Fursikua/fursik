@@ -525,26 +525,77 @@ function enableSwipe() {
 
     allMediaContainers.forEach((mediaContainer) => {
         let startX = 0;
-        let endX = 0;
-        const productIndex = mediaContainer.getAttribute('data-product-index'); // Отримуємо індекс продукту
+        let currentX = 0;
+        let isSwiping = false;
+        const productIndex = mediaContainer.getAttribute('data-product-index'); // Індекс продукту
+        const mediaFiles = mediaContainer.querySelectorAll('.media-file');
 
-        // Початок свайпу
-        mediaContainer.addEventListener('touchstart', (e) => {
+        function onTouchStart(e) {
             startX = e.touches[0].clientX;
+            isSwiping = true;
+        }
+
+        function onTouchMove(e) {
+            if (!isSwiping) return;
+            currentX = e.touches[0].clientX;
+            const deltaX = currentX - startX;
+
+            // Додаємо легкий візуальний зсув
+            mediaContainer.style.transform = `translateX(${deltaX}px)`;
+        }
+
+        function onTouchEnd() {
+            if (!isSwiping) return;
+            const deltaX = currentX - startX;
+
+            // Якщо свайп достатньо довгий, змінюємо елемент
+            if (deltaX > 50) {
+                changeMedia(productIndex, -1); // Свайп назад
+            } else if (deltaX < -50) {
+                changeMedia(productIndex, 1); // Свайп вперед
+            }
+
+            // Скидаємо позицію
+            mediaContainer.style.transform = 'translateX(0)';
+            isSwiping = false;
+        }
+
+        // Додаємо обробники подій
+        mediaContainer.addEventListener('touchstart', onTouchStart);
+        mediaContainer.addEventListener('touchmove', onTouchMove);
+        mediaContainer.addEventListener('touchend', onTouchEnd);
+
+        // Підтримка для миші (десктопи з сенсорними екранами)
+        mediaContainer.addEventListener('mousedown', (e) => {
+            startX = e.clientX;
+            isSwiping = true;
         });
 
-        // Завершення свайпу
-        mediaContainer.addEventListener('touchend', (e) => {
-            endX = e.changedTouches[0].clientX;
+        mediaContainer.addEventListener('mousemove', (e) => {
+            if (!isSwiping) return;
+            currentX = e.clientX;
+            const deltaX = currentX - startX;
+            mediaContainer.style.transform = `translateX(${deltaX}px)`;
+        });
 
-            const swipeDistance = endX - startX;
-            if (swipeDistance > 50) {
-                // Свайп вправо (назад)
+        mediaContainer.addEventListener('mouseup', () => {
+            if (!isSwiping) return;
+            const deltaX = currentX - startX;
+
+            if (deltaX > 50) {
                 changeMedia(productIndex, -1);
-            } else if (swipeDistance < -50) {
-                // Свайп вліво (вперед)
+            } else if (deltaX < -50) {
                 changeMedia(productIndex, 1);
             }
+
+            mediaContainer.style.transform = 'translateX(0)';
+            isSwiping = false;
+        });
+
+        mediaContainer.addEventListener('mouseleave', () => {
+            if (!isSwiping) return;
+            mediaContainer.style.transform = 'translateX(0)';
+            isSwiping = false;
         });
     });
 }
