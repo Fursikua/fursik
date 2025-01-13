@@ -265,7 +265,7 @@ def product_page(slug):
     # Знаходимо товар за slug
     product = next((p for p in products if slug == generate_slug(p)), None)
     if not product:
-        return "Товар не знайдено", 404
+        return render_template('404.html', message="Товар не знайдено", title="Помилка 404"), 404
 
     # Отримуємо дані кошика з localStorage через куки (якщо використовуються)
     cart_data = request.cookies.get('cart')
@@ -277,8 +277,18 @@ def product_page(slug):
     else:
         cart_data = {'items': [], 'total': 0}
 
+    # Перевірка структури cart_data та додавання відсутніх ключів
+    if not isinstance(cart_data, dict):
+        cart_data = {'items': [], 'total': 0}
+    cart_data.setdefault('items', [])
+    cart_data.setdefault('total', 0)
+
+        # Додаємо перевірку для старої ціни
+    if 'old_price' not in product:
+        product['old_price'] = None  # Якщо стара ціна відсутня
+
     # Використовуємо HTML-шаблон для створення сторінки
-    return render_template('product.html', product=product, cart=cart_data)
+    return render_template('product.html', product=product, cart=cart_data, title=product['name'])
 
 def generate_slug(product):
     """Генеруємо SEO-дружній URL"""

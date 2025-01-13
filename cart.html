@@ -196,10 +196,10 @@ button:hover {
             itemDiv.classList.add('cart-item');
             itemDiv.innerHTML = `
                 <div style="display: flex; align-items: center;">
-                    <!-- Додаємо зображення товару -->
-                    <img src="https://fursik-b40362fa22e8.herokuapp.com${item.files[0]}" alt="${item.name}" style="width: 50px; height: 50px; margin-right: 10px;">
+                    <img src="${item.mediaFile || item.imageSrc}" alt="${item.name}" style="width: 50px; height: 50px; margin-right: 10px;">
                     <div>
                         <h3>${item.name}</h3>
+                        <p>Артикул: ${item.article}</p>
                         ${item.modification ? `<p>Модифікація: <strong>${item.modification}</strong></p>` : ""}
                     </div>
                 </div>
@@ -216,7 +216,6 @@ button:hover {
     } else {
         cartItemsDiv.innerHTML = "<p>Ваш кошик порожній.</p>";
         cartTotal.textContent = `0 грн`;
-        document.querySelector('button[onclick="openOrderForm()"]').disabled = true; // Заблокувати кнопку
     }
 }
         // Оновлення кількості товару
@@ -265,16 +264,14 @@ button:hover {
             loadCart(); // Оновлюємо відображення кошика
         }
 
-        // Повернення до сторінки покупок
         function returnToShopping() {
-    const previousPage = sessionStorage.getItem('previousPage');
-
-    if (previousPage && previousPage.includes('catalog')) {
-        // Якщо попередня сторінка є і вона з каталогу товарів, переходимо назад
-        window.location.href = previousPage;
+    // Перевіряємо, чи є попередня сторінка в історії браузера
+    if (document.referrer) {
+        // Повертаємо користувача на попередню сторінку
+        window.location.href = document.referrer;
     } else {
-        // Якщо немає попередньої сторінки або це не каталог, повертаємо на головну
-        window.location.href = 'index.html';
+        // Якщо попередня сторінка недоступна, повертаємо на головну
+        window.location.href = '/index.html';
     }
 }
 

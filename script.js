@@ -126,25 +126,12 @@ function addToCart(article, modification = null) {
     const product = products.find(product => product.article === article);
     if (!product) return;
 
-    // Перевірка: якщо товар має модифікації, але модифікацію не передано
-    if (product.modifications && product.modifications.length > 0 && !modification) {
-        // Display the pointing hand and message
-        const detailButton = document.querySelector(`[onclick="openProductDetailModal('${article}')"]`);
-        if (detailButton) {
-            // Check if the notification already exists
-            let notification = detailButton.parentElement.querySelector('.modification-notification');
-            if (!notification) {
-                notification = document.createElement('div');
-                notification.classList.add('modification-notification');
-                notification.innerHTML = `
-                    <span>👉</span> <span>Виберіть модифікацію</span>
-                `;
-                detailButton.parentElement.appendChild(notification);
+    // Отримуємо перше зображення товару
+    const imageSrc = product.files.length > 0 ? product.files[0] : '';
 
-                // Automatically remove the notification after 3 seconds
-                setTimeout(() => notification.remove(), 3000);
-            }
-        }
+    // Перевірка модифікацій
+    if (product.modifications && product.modifications.length > 0 && !modification) {
+        alert('Будь ласка, оберіть модифікацію!');
         return;
     }
 
@@ -154,7 +141,7 @@ function addToCart(article, modification = null) {
     if (existingProduct) {
         existingProduct.quantity += 1;
     } else {
-        const newProduct = { ...product, quantity: 1, modification }; // Додаємо модифікацію
+        const newProduct = { ...product, quantity: 1, modification, imageSrc };
         cart.items.push(newProduct);
     }
 

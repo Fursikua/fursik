@@ -1,5 +1,4 @@
 /* Загальні стилі */
-/* Додаємо фон для сторінки */
 body {
     font-family: 'Neucha', sans-serif; /* Застосовуємо Neucha як основний шрифт */
     margin: 0;
@@ -9,218 +8,191 @@ body {
     background-position: center;
     background-attachment: fixed;
     font-size: 20px; /* Базовий розмір шрифту */
-    line-height: 0,8; /* Зручний міжрядковий інтервал */
+    line-height: 1.5; /* Міжрядковий інтервал */
     color: #333; /* Основний колір тексту */
 }
-/* Основний заголовок */
+
 .main-header {
     display: flex;
-    align-items: center; /* Вирівнювання по вертикалі */
-    justify-content: space-between; /* Простір між блоками */
-    padding: 20px;
-    max-width: 1200px; /* Максимальна ширина */
-    margin: 0 auto; /* Центрування блоку */
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f8f9fa;
     background: linear-gradient(45deg, #af6c3b, #753e00, #ff8c00); /* Фон заголовка */
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    flex-wrap: wrap; /* Для адаптивності на малих екранах */
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+    flex: 1; /* Займає всю вільну частину контейнера */
 }
 
+/* Логотип */
 .logo-container {
-    flex: 0 0 auto; /* Фіксуємо розмір блоку логотипу */
-    margin-right: 20px; /* Відступ від контенту */
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
 }
 
 .logo {
-    max-width: 150px; /* Розмір логотипу */
+    max-width: 300px; /* Розмір логотипу */
     height: auto;
     border-radius: 50%; /* Закруглені краї */
+    transition: box-shadow 0.3s ease, transform 0.3s ease; /* Анімація */
 }
 
-.content-container {
-    flex: 1; /* Забирає залишковий простір */
-    text-align: right; /* Вирівнювання тексту праворуч */
+.logo:hover {
+    box-shadow: 0 0 10px 5px rgba(0, 123, 255, 0.5); /* Підсвічування */
+    transform: scale(1.05); /* Легка зміна розміру при наведенні */
 }
 
+/* Заголовок сайту */
 .site-logo {
     display: flex;
-    align-items: center; /* Вирівнювання логотипу та тексту по вертикалі */
-    gap: 10px;
-    font-family: 'Arial', sans-serif;
-    font-size: clamp(1.3em, 5vw, 2em); /* Динамічний розмір шрифту */
-    color: #fff;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 2px;
+    flex-direction: column;
+    justify-content: center;
+    margin-right: auto;
 }
+
 .site-logo a {
     text-decoration: none;
-    color: #333; /* Новий колір тексту, наприклад, помаранчевий */
-    font-weight: inherit;
-    transition: color 0.3s ease; /* Плавний перехід кольору */
-    
+    color: #333;
+    font-size: 1.5rem;
+    font-weight: bold;
+    transition: color 0.3s ease;
+    text-align: center; /* Додаємо вирівнювання тексту */
 }
 
 .site-logo a:hover {
-    color: #f4f4f4; /* Колір при наведенні, наприклад, світліший помаранчевий */
+    color: #007bff;
 }
 
+/* Контейнер для пошукового рядка */
+.content-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
 
 .search-bar {
     display: flex;
-    justify-content: flex-end; /* Вирівнювання елементів праворуч */
-    gap: 5px; /* Простір між полем і кнопкою */
-    margin-top: 10px;
+    align-items: center;
+    gap: 5px;
 }
 
 #search-input {
-    padding: 8px 12px;
-    width: 200px; /* Ширина поля введення */
+    padding: 8px;
+    font-size: 1rem;
     border: 1px solid #ccc;
     border-radius: 4px;
-    font-size: 1em;
-    flex: 1; /* Поле займає весь доступний простір */
+    flex: 1;
+    min-width: 200px;
 }
 
-.search-bar button {
+button {
     padding: 8px 12px;
-    width: calc(50% - 5px); /* Кнопка в половину менша за поле введення */
-    background-color: #ffa500;
-    color: white;
+    background-color: #007bff;
+    color: #fff;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 1em;
+    transition: background-color 0.3s ease;
 }
 
-.search-bar button:hover {
-    background-color: #ff8c00;
-}
-/* Адаптивність */
-@media (max-width: 1024px) {
-    .main-header {
-        flex-wrap: wrap; /* Перехід на вертикальне розташування */
-        text-align: center;
-    }
-
-    .logo-container {
-        flex: 0 0 100%; /* Логотип займає всю ширину */
-        margin-bottom: 10px; /* Відступ знизу */
-        text-align: center;
-    }
-
-    .content-container {
-        flex: 0 0 100%; /* Контент займає всю ширину */
-        text-align: center; /* Центрування тексту */
-    }
-
-    .search-bar {
-        justify-content: center; /* Центрування пошуку */
-    }
+button:hover {
+    background-color: #0056b3;
 }
 
 @media (max-width: 768px) {
-    .logo {
-        max-width: 120px; /* Менший розмір логотипу */
+    .main-header {
+        flex-direction: column;
+        align-items: center; /* Центрує всі елементи всередині .main-header */
     }
+
+    .logo-container, .content-container {
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+    .logo {
+        max-width: 110px; /* Розмір логотипу */
+    }    
 
     .site-logo {
-        font-size: 1.5em; /* Менший шрифт */
+        text-align: center; /* Центрує вміст всередині контейнера site-logo */
+        width: 100%; /* Забезпечує розтягнення по всій ширині */
     }
 
-    .search-bar {
-        flex-direction: column; /* Вертикальне розташування на малих екранах */
-        align-items: stretch; /* Розтягування елементів */
+    .site-logo a {
+        display: block; /* Робить текст блоковим елементом для центрування */
+        text-align: center; /* Центрує текст */
+        margin: 0 auto; /* Забезпечує автоматичне вирівнювання по горизонталі */
     }
 
     #search-input {
-        width: 95%; /* Поле займає всю ширину */
+        min-width: 100%;
     }
 
-    .search-bar button {
-        width: calc(50% - 5px); /* Завжди половина ширини поля */
-        align-self: center; /* Центруємо кнопку */
-    }
-}
-@media (max-width: 480px) {
-    .site-logo {
-        font-size: 1.3em; /* Ще менший шрифт */
-    }
-
-    .search-bar button {
-        font-size: 0.7em; /* Менший текст на кнопці */
+    .search-bar {
+        flex-direction: column;
+        gap: 10px;
     }
 }
 
 header {
     color: white;
-    padding: 1px;
+    padding: 10px;
     text-align: center;
     font-size: 1.5em;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
 /* Контейнер заголовка */
 .header-container {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    transition: opacity 0.3s ease, display 0s ease 0.3s; /* Анімація для плавного зникнення */
+    align-items: stretch;
+    padding: 10px 0; /* Зменшено внутрішній відступ */
+    height: auto; /* Видалено зайву висоту */
 }
 
 .search-bar {
     text-align: center;
-    margin: 20px auto;
+    margin: 0 auto; /* Зменшено зовнішній відступ */
 }
 
 /* Ліва частина заголовка */
 .header-left {
-    flex: 1;
-}
-
-/* Права частина заголовка (відео) */
-.header-right {
-    width: 100%;
-}
-/* Відео у правій частині */
-.header-right iframe {
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-iframe {
-    border: none;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    flex: 0 0 150px; /* Фіксована ширина */
+    position: sticky;
+    top: 0;
+    height: auto; /* Видалено зайву висоту */
+    background-color: rgba(51, 51, 51, 0.8); /* Напівпрозорий фон */
+    padding: 10px;
 }
 
 /* Вертикальне меню */
-   .nav-bar.vertical {
+.nav-bar.vertical {
     display: flex;
     flex-direction: column;
-    width: flex; /* Ширина меню */
-    position: static;
-    left: 0;
-    background-color: #333;
-    padding: 10px;
-    height: auto;
+    width: 100%;
+    position: relative;
+    background-color: rgba(51, 51, 51, 0.9); /* Напівпрозорий фон */
 }
 
-    .nav-bar.vertical a {
+.nav-bar.vertical a {
     display: block;
     color: rgb(249, 248, 248);
     margin: 10px 0;
     text-align: center;
     text-decoration: none;
 }
+
 /* Стилі для випадаючого меню */
 .dropdown {
     position: relative;
     padding: 5px;
 }
+
 .dropdown-content {
     display: none;
-    position: static;
-    background-color: #444;
+    position: absolute;
+    background-color: rgba(68, 68, 68, 0.9); /* Напівпрозорий фон */
     box-shadow: 0px 20px 16px rgba(0, 0, 0, 0.2);
     min-width: 260px;
     z-index: 1;
@@ -228,18 +200,21 @@ iframe {
     border-radius: 5px;
     overflow: hidden;
 }
+
 .dropdown-content a {
-    color: #333;
+    color: #fff;
     padding: 12px 16px;
     text-decoration: none;
     display: block;
     border-bottom: 1px solid #d57a7a;
 }
+
 .dropdown-content a:hover {
     background-color: #ff6d34;
 }
+
 .dropdown:hover .dropdown-content {
-display: block;
+    display: block;
 }
 /* Контейнер для кнопки */
 .view-toggle-container {
