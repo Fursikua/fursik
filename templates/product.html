@@ -70,7 +70,6 @@
         </div>
     </div>
     </div>
-<header>
 
                     <!-- Основний блок кошика -->
     <!-- Блок кошика на головній сторінці -->
@@ -87,6 +86,8 @@
             <button onclick="clearCart()">Очистити кошик</button>
         </div>
     </div>
+<header>
+
     <h1>{{ product.name }}</h1>
     <section class="product-gallery">
         <div class="gallery">
@@ -99,12 +100,12 @@
     <div id="product-details">
         <p>Артикул: {{ product.article }}</p>
         <p>Опис: {{ product.description }}</p>
-        {% if product.old_price %}
-        <p>Стара ціна: <span style="text-decoration: line-through; color: #e60000;">{{ product.old_price }} грн</span></p>
-    {% endif %}
-    <p>Ціна: <span style="font-weight: bold;">{{ product.price }} грн</span></p>
+        {% if product.oldPrice %}
+        <p>Стара ціна: <span style="text-decoration: line-through; color: #e60000;">{{ product.oldPrice }} грн</span></p>
+        {% endif %}
+        <p>Ціна: <span style="font-weight: bold;">{{ product.price }} грн</span></p>
     </div>
-
+    
     <div id="modifications-container">
         <label for="modification-select">Оберіть модифікацію:</label>
         <select id="modification-select">

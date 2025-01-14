@@ -31,7 +31,7 @@ body {
 }
 
 .logo {
-    max-width: 300px; /* Розмір логотипу */
+    max-width: 250px; /* Розмір логотипу */
     height: auto;
     border-radius: 50%; /* Закруглені краї */
     transition: box-shadow 0.3s ease, transform 0.3s ease; /* Анімація */
@@ -133,13 +133,103 @@ button:hover {
         gap: 10px;
     }
 }
-
+/* Стилі для розділу товару в header */
 header {
-    color: white;
-    padding: 10px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    max-width: 800px;
+}
+
+header h1 {
+    font-family: 'Neucha', sans-serif;
+    font-size: 2em;
+    color: #333;
+    margin-bottom: 15px;
     text-align: center;
-    font-size: 1.5em;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.product-gallery .gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.product-gallery .gallery img {
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    transition: transform 0.3s ease;
+}
+
+.product-gallery .gallery img:hover {
+    transform: scale(1.05);
+    border-color: #007bff;
+}
+
+#product-details {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin-top: 20px;
+    background-color: #f2f2f2; /* Світло-сірий фон */
+    padding: 15px; /* Внутрішні відступи */
+    border-radius: 10px; /* Закруглені кути */
+    border: 1px solid #ddd; /* Легка обводка */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Тінь */
+}
+#product-details p {
+    margin: 10px 0;
+}
+
+#product-details p {
+    margin: 10px 0;
+}
+
+#product-details p {
+    display: block; /* Перетворення на блочний елемент */
+    margin-top: 10px;
+    font-size: 1em;
+    color: #333;
+}
+
+#product-details .old-price {
+    color: #e60000;
+    text-decoration: line-through;
+}
+
+#product-details .price {
+    font-weight: bold;
+    color: #007bff;
+    font-size: 1.2em;
+}
+
+#modifications-container {
+    margin: 20px 0;
+}
+
+#modifications-container select {
+    padding: 5px;
+    font-size: 1em;
+    margin-left: 10px;
+}
+
+header button {
+    padding: 10px 20px;
+    font-size: 1em;
+    margin: 10px 5px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ffa500;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+header button:hover {
+    background-color: #0056b3;
 }
 
 /* Контейнер заголовка */
