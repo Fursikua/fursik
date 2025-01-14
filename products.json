@@ -24,7 +24,20 @@
             "/upload/bluetooth_headphones_2.jpg"
         ],
         "modifications": [
-            "null"
+            "Чорний",
+            "Білий",
+            "Червоний"
         ]
+    },
+    {
+        "name": "USB-кабель",
+        "article": "el5647382910456789123",
+        "price": 100.0,
+        "oldPrice": null,
+        "description": "Надійний USB-кабель для зарядки та передачі даних.",
+        "files": [
+            "/upload/usb_cable_1.jpg"
+        ],
+        "modifications": null
     }
 ]
