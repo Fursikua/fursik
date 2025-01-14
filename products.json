@@ -12,5 +12,19 @@
         "modifications": [
             "40х40"
         ]
+    },
+    {
+        "name": "Bluetooth-навушники",
+        "article": "el9876543210156789453",
+        "price": 1500.0,
+        "oldPrice": 1800,
+        "description": "Безпровідні Bluetooth-навушники з високоякісним звуком та зручним дизайном.",
+        "files": [
+            "/upload/bluetooth_headphones_1.jpg",
+            "/upload/bluetooth_headphones_2.jpg"
+        ],
+        "modifications": [
+            null
+        ]
     }
 ]

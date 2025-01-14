@@ -106,15 +106,17 @@
         <p>Ціна: <span style="font-weight: bold;">{{ product.price }} грн</span></p>
     </div>
     
+    {% if product.modifications and product.modifications|length > 0 %}
     <div id="modifications-container">
         <label for="modification-select">Оберіть модифікацію:</label>
         <select id="modification-select">
             {% for mod in product.modifications %}
-                <option value="{{ mod }}">{{ mod }}</option>
+            <option value="{{ mod }}">{{ mod }}</option>
             {% endfor %}
         </select>
     </div>
-<button onclick="addToCartWithModification('{{ product.article }}'); animateAddToCart(this);">Додати в кошик</button>
+    {% endif %}
+    <button onclick="addToCartWithModification('{{ product.article }}'); animateAddToCart(this);">Додати в кошик</button>
 <button onclick="window.location.href='/'">Повернутися до головної</button>
 
 </header>
