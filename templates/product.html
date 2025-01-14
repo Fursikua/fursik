@@ -87,18 +87,9 @@
         </div>
     </div>
 <header>
+    <button onclick="window.location.href='/'">Повернутися до головної</button>
+
     <button onclick="addToCartWithModification('{{ product.article }}'); animateAddToCart(this);">Додати в кошик</button>
-<button onclick="window.location.href='/'">Повернутися до головної</button>
-{% if product.modifications and product.modifications|length > 0 %}
-<div id="modifications-container">
-    <label for="modification-select">Оберіть модифікацію:</label>
-    <select id="modification-select">
-        {% for mod in product.modifications %}
-        <option value="{{ mod }}">{{ mod }}</option>
-        {% endfor %}
-    </select>
-</div>
-{% endif %}
 
     <h1>{{ product.name }}</h1>
     <section class="product-image-gallery">
