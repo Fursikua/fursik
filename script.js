@@ -683,10 +683,11 @@ async function renderPromoProducts() {
                 ? product.description.substring(0, 100) + '...'
                 : product.description;
 
+                const slug = `${product.article}-${product.name.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')}`;
+
             promoWrapper.innerHTML += `
                 <div class="promo-item">
-                    <h3>${product.name}</h3>
-                    <p>Артикул: ${product.article}</p>
+                <h3><a href="/product/${slug}" target="_blank">${product.name}</a></h3>
                     <div class="image-gallery">${gallery}</div>
                     <div class="prices">${oldPriceHTML} ${newPriceHTML}</div>
                     <p>${shortDescription}</p>

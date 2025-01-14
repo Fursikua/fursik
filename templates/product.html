@@ -87,15 +87,37 @@
         </div>
     </div>
 <header>
+    <button onclick="addToCartWithModification('{{ product.article }}'); animateAddToCart(this);">Додати в кошик</button>
+<button onclick="window.location.href='/'">Повернутися до головної</button>
+{% if product.modifications and product.modifications|length > 0 %}
+<div id="modifications-container">
+    <label for="modification-select">Оберіть модифікацію:</label>
+    <select id="modification-select">
+        {% for mod in product.modifications %}
+        <option value="{{ mod }}">{{ mod }}</option>
+        {% endfor %}
+    </select>
+</div>
+{% endif %}
 
     <h1>{{ product.name }}</h1>
-    <section class="product-gallery">
-        <div class="gallery">
+    <section class="product-image-gallery">
+        <div class="image-thumbnails">
             {% for file in product.files %}
-                <img src="{{ file }}" alt="{{ product.name }}" style="width:200px; margin:5px;">
+                <img src="{{ file }}" alt="{{ product.name }}, {{ product.description }}" class="product-thumbnail" style="width:200px; margin:5px;">
             {% endfor %}
         </div>
     </section>
+    
+    <!-- Модальне вікно для перегляду зображень -->
+    <div id="imagePreviewModal" class="image-preview-modal">
+        <span class="modal-close" onclick="closeImageModal()">&times;</span>
+        <img class="preview-image" id="previewImage">
+        <div class="image-caption" id="imageCaption"></div>
+        <button class="navigate-button prev-button" onclick="changeImage(-1)">&#10094;</button>
+        <button class="navigate-button next-button" onclick="changeImage(1)">&#10095;</button>
+    </div>
+    
 
     <div id="product-details">
         <p>Артикул: {{ product.article }}</p>
@@ -122,7 +144,6 @@
 </header>
 
     </main>
-    <script src="/pscript.js"></script>
     <script>
         // Load cart data from localStorage and pass it to the server or UI
         const cartData = JSON.parse(localStorage.getItem('cart')) || { items: [], total: 0 };
@@ -186,6 +207,13 @@
         </div>
                 </ul>
 </section>
+<script src="/pscript.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        renderPromoProducts();
+    });
+</script>
+
 <!-- Футер -->
 <footer>
     &copy; 2024 Інтернет-магазин "FursikUA". Всі права захищені.
