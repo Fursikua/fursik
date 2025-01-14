@@ -262,7 +262,7 @@ function addToCartWithModification(article) {
     }
 
     // Отримуємо зображення товару
-    const imageSrc = document.querySelector('.product-gallery img')?.src || '';
+    const imageSrc = document.querySelector('.product-image-gallery img')?.src || '';
 
     let cart = JSON.parse(localStorage.getItem('cart')) || { items: [], total: 0 };
 
