@@ -25,58 +25,418 @@ window.onclick = function(event) {
 };
 
 function searchProducts() {
-    const query = document.getElementById('search-input').value.trim().toLowerCase();
+    const query = document.getElementById('search-input').value.trim().toLowerCase(); // Отримуємо запит користувача
+    const productList = document.getElementById('product-list');
+
+    // Якщо поле пошуку порожнє, не відображаємо товари
+    if (query === '') {
+        productList.innerHTML = ''; // Очищаємо список товарів
+        productList.style.display = 'none'; // Сховуємо список товарів
+        return;
+    }
+
+    // Фільтруємо продукти за назвою або описом
     const filteredProducts = products.filter(product =>
-        product.name.toLowerCase().includes(query) || product.description.toLowerCase().includes(query)
+        product.name.toLowerCase().includes(query) || 
+        product.description.toLowerCase().includes(query)
     );
 
-    const productList = document.getElementById('product-list');
+    // Якщо немає результатів пошуку
     if (filteredProducts.length === 0) {
         productList.innerHTML = '<p>Товарів за вашим запитом не знайдено.</p>';
     } else {
-        renderProducts(filteredProducts);
+        renderProducts(filteredProducts); // Викликаємо функцію для рендерингу відфільтрованих товарів
+    }
+
+    // Показуємо список товарів після фільтрації
+    productList.style.display = 'grid';
+}
+
+const productGrid = document.querySelector('.product-grid');
+
+function addModificationField() {
+    const container = document.getElementById("modifications-container");
+    const newField = document.createElement("div");
+    newField.className = "modification-field";
+    newField.innerHTML = `
+        <input type="text" name="modification" placeholder="Введіть модифікацію">
+        <button type="button" onclick="removeField(this)">-</button>
+    `;
+    container.appendChild(newField);
+}
+
+function removeField(button) {
+    const field = button.parentElement;
+    field.remove();
+}
+
+let products = [];
+
+async function loadProducts() {
+    try {
+        const response = await fetch('https://fursik-b40362fa22e8.herokuapp.com/products');
+        if (!response.ok) throw new Error('Помилка завантаження товарів');
+        products = await response.json();
+        renderProducts(products);
+    } catch (error) {
+        console.error('Помилка завантаження:', error);
+        document.getElementById('product-list').innerHTML = '<p>Помилка завантаження товарів</p>';
     }
 }
 
-let currentImageIndex = 0;
-let images = document.querySelectorAll('.product-thumbnail');
-let modal = document.getElementById("imagePreviewModal");
-let previewImage = document.getElementById("previewImage");
-let caption = document.getElementById("imageCaption");
+function renderProducts(products) {
+    const productList = document.getElementById('product-list');
+    productList.innerHTML = ''; // Очищаємо попередні товари
 
-// Відкриває модальне вікно при кліку на зображення
-images.forEach((img, index) => {
-    img.addEventListener("click", function() {
-        openImageModal(index);
+    products.forEach((product, index) => {
+        const oldPriceHTML = product.oldPrice ? `<span class="old-price">${product.oldPrice} грн</span>` : '';
+        const newPriceHTML = `<span class="new-price">${product.price} грн</span>`;
+        const shortDescription = product.description.length > 100
+            ? product.description.substring(0, 100) + '...'
+            : product.description;
+
+        const gallery = product.files.map((file, fileIndex) => {
+            const fileExtension = file.split('.').pop().toLowerCase();
+            const fileUrl = `https://fursik-b40362fa22e8.herokuapp.com/${file}`;
+
+            if (['mp4', 'mov', 'avi', 'webm'].includes(fileExtension)) {
+                return `
+                    <video data-file-index="${fileIndex}" class="media-file" controls style="display: ${fileIndex === 0 ? 'block' : 'none'};">
+                        <source src="${fileUrl}" type="video/${fileExtension}">
+                        Ваш браузер не підтримує відтворення цього відео.
+                    </video>
+                `;
+            } else if (['jpg', 'jpeg', 'png', 'gif', 'bmp'].includes(fileExtension)) {
+                return `
+                    <img data-file-index="${fileIndex}" class="media-file" src="${fileUrl}" style="display: ${fileIndex === 0 ? 'block' : 'none'};" alt="${product.name}">
+                `;
+            } else {
+                return `<a href="${fileUrl}" target="_blank" class="media-file" style="display: ${fileIndex === 0 ? 'block' : 'none'};">Переглянути файл</a>`;
+            }
+        }).join('');
+
+        const navigationButtons = product.files.length > 1
+            ? `
+                <button class="navigation-btn" onclick="changeMedia(${index}, -1)">Назад</button>
+                <button class="navigation-btn" onclick="changeMedia(${index}, 1)">Далі</button>
+            `
+            : '';
+
+        const slug = `${product.article}-${product.name.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')}`;
+
+        productList.innerHTML += `
+            <div class="product-item">
+                <h3><a href="/product/${slug}" target="_blank">${product.name}</a></h3>
+                <p>Артикул: ${product.article}</p>
+                <div id="media-${index}" class="image-gallery" data-product-index="${index}">${gallery}</div>
+                ${navigationButtons}
+                <p id="description-${index}">${shortDescription}</p>
+                <div class="prices">
+                    ${oldPriceHTML} ${newPriceHTML}
+                </div>
+            </div>
+        `;
+    });
+
+    enableSwipe(); // Додаємо підтримку свайпів для всіх товарів
+}
+function addProduct(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("new-name").value;
+    const price = parseFloat(document.getElementById("new-price").value);
+    const description = document.getElementById("new-description").value;
+    const fileInput = document.getElementById("new-file");
+
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('price', price);
+    formData.append('description', description);
+
+    for (let i = 0; i < fileInput.files.length; i++) {
+        formData.append('file', fileInput.files[i]);
+    }
+
+    fetch('https://fursik-b40362fa22e8.herokuapp.com/upload', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('status').textContent = 'Файл(и) успішно завантажено!';
+            loadProducts();
+            document.getElementById("add-product-form").reset();
+        } else {
+            document.getElementById('status').textContent = 'Помилка при завантаженні файлу.';
+        }
+    })
+    .catch(error => {
+        document.getElementById('status').textContent = 'Помилка на сервері.';
+        console.error('Error:', error);
+    });
+}
+
+function changeMedia(productIndex, direction) {
+    const mediaContainer = document.querySelector(`.image-gallery[data-product-index="${productIndex}"]`);
+    if (!mediaContainer) return;
+
+    const mediaFiles = mediaContainer.querySelectorAll('.media-file');
+    const currentFileIndex = Array.from(mediaFiles).findIndex(file => file.style.display === 'block');
+
+    // Обчислюємо наступний індекс
+    let nextFileIndex = currentFileIndex + direction;
+    if (nextFileIndex < 0) nextFileIndex = mediaFiles.length - 1;
+    if (nextFileIndex >= mediaFiles.length) nextFileIndex = 0;
+
+    // Оновлюємо відображення файлів
+    mediaFiles.forEach((file, index) => {
+        file.style.display = index === nextFileIndex ? 'block' : 'none';
+    });
+}
+function toggleView() {
+    const productGrid = document.getElementById('product-list');
+    const toggleBtn = document.getElementById('view-toggle-btn');
+
+    // Перемикання класу для контейнера продуктів
+    if (productGrid.classList.contains('two-columns')) {
+        productGrid.classList.remove('two-columns');
+        toggleBtn.textContent = 'Змінити вид'; // Оновлюємо текст кнопки
+    } else {
+        productGrid.classList.add('two-columns');
+        toggleBtn.textContent = 'Повернути стандартний вигляд';
+    }
+}
+document.addEventListener("DOMContentLoaded", function () {
+    const toggleButton = document.getElementById("view-toggle-btn");
+    const originalOffsetTop = toggleButton.offsetTop; // Початкове положення кнопки
+
+    window.addEventListener("scroll", function () {
+        if (window.scrollY > originalOffsetTop) {
+            toggleButton.classList.add("fixed");
+        } else {
+            toggleButton.classList.remove("fixed");
+        }
     });
 });
 
-function openImageModal(index) {
-    modal.style.display = "block";
-    previewImage.src = images[index].src;
-    caption.innerHTML = images[index].alt;
-    currentImageIndex = index;
-}
+function hideNavigationButtonsForTouchDevices() {
+    // Перевірка на сенсорний пристрій
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-// Закриває модальне вікно
-function closeImageModal() {
-    modal.style.display = "none";
-}
+    if (isTouchDevice) {
+        // Знаходимо всі кнопки "Назад" і "Далі"
+        const navigationButtons = document.querySelectorAll('.navigation-btn');
 
-// Перемикає зображення вперед/назад
-function changeImage(direction) {
-    currentImageIndex += direction;
-
-    // Перевірка, щоб зациклювати зображення
-    if (currentImageIndex >= images.length) {
-        currentImageIndex = 0;
-    } else if (currentImageIndex < 0) {
-        currentImageIndex = images.length - 1;
+        // Додаємо клас для приховування
+        navigationButtons.forEach(button => {
+            button.classList.add('touch-hidden');
+        });
     }
-
-    previewImage.src = images[currentImageIndex].src;
-    caption.innerHTML = images[currentImageIndex].alt;
 }
+
+// Викликаємо функцію після завантаження сторінки
+document.addEventListener('DOMContentLoaded', hideNavigationButtonsForTouchDevices);
+window.addEventListener('resize', hideNavigationButtonsForTouchDevices);
+
+function enableSwipe() {
+    const allMediaContainers = document.querySelectorAll('.image-gallery'); // Отримуємо всі галереї
+
+    allMediaContainers.forEach((mediaContainer) => {
+        let startX = 0;
+        let currentX = 0;
+        let isSwiping = false;
+        const productIndex = mediaContainer.getAttribute('data-product-index'); // Індекс продукту
+        const mediaFiles = mediaContainer.querySelectorAll('.media-file');
+
+        function onTouchStart(e) {
+            startX = e.touches[0].clientX;
+            isSwiping = true;
+        }
+
+        function onTouchMove(e) {
+            if (!isSwiping) return;
+            currentX = e.touches[0].clientX;
+            const deltaX = currentX - startX;
+
+            // Додаємо легкий візуальний зсув
+            mediaContainer.style.transform = `translateX(${deltaX}px)`;
+        }
+
+        function onTouchEnd() {
+            if (!isSwiping) return;
+            const deltaX = currentX - startX;
+
+            // Якщо свайп достатньо довгий, змінюємо елемент
+            if (deltaX > 50) {
+                changeMedia(productIndex, -1); // Свайп назад
+            } else if (deltaX < -50) {
+                changeMedia(productIndex, 1); // Свайп вперед
+            }
+
+            // Скидаємо позицію
+            mediaContainer.style.transform = 'translateX(0)';
+            isSwiping = false;
+        }
+
+        // Додаємо обробники подій
+        mediaContainer.addEventListener('touchstart', onTouchStart);
+        mediaContainer.addEventListener('touchmove', onTouchMove);
+        mediaContainer.addEventListener('touchend', onTouchEnd);
+
+        // Підтримка для миші (десктопи з сенсорними екранами)
+        mediaContainer.addEventListener('mousedown', (e) => {
+            startX = e.clientX;
+            isSwiping = true;
+        });
+
+        mediaContainer.addEventListener('mousemove', (e) => {
+            if (!isSwiping) return;
+            currentX = e.clientX;
+            const deltaX = currentX - startX;
+            mediaContainer.style.transform = `translateX(${deltaX}px)`;
+        });
+
+        mediaContainer.addEventListener('mouseup', () => {
+            if (!isSwiping) return;
+            const deltaX = currentX - startX;
+
+            if (deltaX > 50) {
+                changeMedia(productIndex, -1);
+            } else if (deltaX < -50) {
+                changeMedia(productIndex, 1);
+            }
+
+            mediaContainer.style.transform = 'translateX(0)';
+            isSwiping = false;
+        });
+
+        mediaContainer.addEventListener('mouseleave', () => {
+            if (!isSwiping) return;
+            mediaContainer.style.transform = 'translateX(0)';
+            isSwiping = false;
+        });
+    });
+}
+
+function toggleDescription(index) {
+    const descriptionElement = document.getElementById(`description-${index}`);
+    const toggleButton = document.getElementById(`toggle-btn-${index}`);
+    const product = products[index];
+
+    if (toggleButton.innerText === "Детальніше") {
+        descriptionElement.textContent = product.description;
+        toggleButton.innerText = "Згорнути";
+    } else {
+        const shortDescription = product.description.length > 100
+            ? product.description.substring(0, 100) + '...'
+            : product.description;
+        descriptionElement.textContent = shortDescription;
+        toggleButton.innerText = "Детальніше";
+    }
+}
+function filterProductsByArticlePrefix(prefix) {
+    // Фільтруємо товари за префіксом артикля
+    const filteredProducts = products.filter(product => 
+        product.article && product.article.startsWith(prefix)
+    );
+
+    const productList = document.getElementById('product-list');
+    
+    if (filteredProducts.length === 0) {
+        productList.innerHTML = '<p>Товарів за вашим запитом не знайдено.</p>';
+    } else {
+        renderProducts(filteredProducts); // Оновлюємо відображення товарів
+
+        // Плавний перехід до першого товару
+        setTimeout(() => {
+            const firstProduct = productList.querySelector('.product-item');
+            if (firstProduct) {
+                firstProduct.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 100); // Невелика затримка, щоб DOM встиг оновитися
+    }
+}
+// Функція для прокрутки вліво
+function scrollLeft() {
+    const promoWrapper = document.querySelector('.promo-products-wrapper');
+    promoWrapper.scrollBy({ left: -300, behavior: 'smooth' });
+}
+
+// Функція для прокрутки вправо
+function scrollRight() {
+    const promoWrapper = document.querySelector('.promo-products-wrapper');
+    promoWrapper.scrollBy({ left: 300, behavior: 'smooth' });
+}
+
+document.addEventListener('DOMContentLoaded', renderPromoProducts);
+
+document.querySelectorAll('.nav-bar a').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault(); // Запобігає стандартному переходу
+        const targetId = this.getAttribute('href').substring(1); // Отримує ID розділу
+        const targetElement = document.getElementById(targetId);
+
+        if (targetElement) {
+            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+});
+
+// Додати функцію для кнопки прокрутки догори
+document.addEventListener("DOMContentLoaded", function () {
+    const scrollToTopBtn = document.getElementById("scroll-to-top");
+
+    // Показати/приховати кнопку залежно від прокрутки
+    window.addEventListener("scroll", function () {
+        if (window.scrollY > 500) {
+            scrollToTopBtn.style.opacity = "1";
+            scrollToTopBtn.style.visibility = "visible";
+        } else {
+            scrollToTopBtn.style.opacity = "0";
+            scrollToTopBtn.style.visibility = "hidden";
+        }
+    });
+
+    // Прокрутити догори при натисканні
+    scrollToTopBtn.addEventListener("click", function () {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth" // Плавна прокрутка
+        });
+    });
+});
+// Функція для контролю видимості футера
+(function() {
+    let lastScrollY = window.scrollY;
+    const footer = document.querySelector('footer');
+
+    window.addEventListener('scroll', () => {
+        const currentScrollY = window.scrollY;
+
+        if (currentScrollY > lastScrollY) {
+            // Прокрутка вниз
+            footer.style.transform = 'translateY(100%)';
+            footer.style.transition = 'transform 0.3s ease';
+        } else {
+            // Прокрутка вверх
+            footer.style.transform = 'translateY(0)';
+        }
+
+        lastScrollY = currentScrollY;
+    });
+})();
+
+
+// Завантаження товарів після завантаження сторінки
+document.addEventListener('DOMContentLoaded', () => {
+    // Завантаження товарів і оновлення відображення кошика
+    loadProducts().then(() => {
+        renderPromoProducts(products);
+    });
+    updateCartDisplay();
+});
+
 
 async function renderPromoProducts() {
     const promoSection = document.getElementById('promo-products');

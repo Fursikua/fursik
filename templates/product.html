@@ -10,6 +10,8 @@
     <meta name="keywords" content="{{ product.name }}, купити, {{ product.article }}">
     <link rel="stylesheet" href="/pstyle.css">
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
 </head>
 <body>
     <div class="header-container">
@@ -56,15 +58,29 @@
                     <img src="/images/FursikUA_Emblem.jpg" alt="FursikUA Logo" class="logo">
                 </a>
             </div>
+
             <div class="content-container">
                 <!-- Пошуковий рядок -->
                 <div class="search-bar">
-                    <input type="text" id="search-input" placeholder="Пошук товарів...">
+                    <input type="text" id="search-input" placeholder="Пошук товарів..." oninput="searchProducts()">
                     <button onclick="searchProducts()">Пошук</button>
                 </div>
+                
+            <div class="contacts">
+                <h2>Контакти</h2>
+                <ul class="contact-list">
+                    <li><strong>Наш телефон:</strong> +380 502694611</li>
+                    <li><strong>Напишіть нам на email:</strong> <a href="https://mail.google.com/mail/?view=cm&fs=1&to=uafursik@gmail.com" target="_blank">uafursik@gmail.com</a></li>
+                    <li><strong>Ми в соцмережах:</strong>
+                        <div class="social-links">
+                            <a href="#" class="social-icon facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="social-icon instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="https://t.me/your-telegram-link" class="social-icon telegram"><i class="fab fa-telegram-plane"></i></a>
+                        </div>
+                    </li>
+                </ul>
             </div>
         </div>
-    
         <div class="header-right">
             <!-- Місце для додаткових елементів -->
         </div>
@@ -86,11 +102,15 @@
             <button onclick="clearCart()">Очистити кошик</button>
         </div>
     </div>
+    <div class="product-grid" id="product-list">
+        <!-- Продукти будуть додані через JavaScript -->
+    </div>
+    
 <header>
     <button onclick="window.location.href='/'">Повернутися до головної</button>
 
     <button onclick="addToCartWithModification('{{ product.article }}'); animateAddToCart(this);">Додати в кошик</button>
-
+    
     <h1>{{ product.name }}</h1>
     <section class="product-image-gallery">
         <div class="image-thumbnails">
@@ -174,15 +194,17 @@
     <h2>Контакти</h2>
     <ul>
         <li><strong>Наш телефон:</strong> +380 502694611</li>
-        <li><strong>Напишіть нам на email:</strong> <a href="https://mail.google.com/mail/?view=cm&fs=1&to=uafursik@gmail.com" target="_blank">uafursik@gmail.com</a></li>
-        <li><strong>Ми в соцмережах:</strong>
-            <ul>
-                <li><a href="#">Facebook</a></li>
-                <li><a href="#">Instagram</a></li>
-                <li><a href="https://t.me/your-telegram-link">Telegram</a></li>
-            </ul>
-        </li>
-        <li><strong>Де ми знаходимося:</strong> 
+        <ul class="contact-list">
+            <li><strong>Напишіть нам на email:</strong> <a href="https://mail.google.com/mail/?view=cm&fs=1&to=uafursik@gmail.com" target="_blank">uafursik@gmail.com</a></li>
+            <li><strong>Ми в соцмережах:</strong>
+                <div class="social-links">
+                    <a href="#" class="social-icon facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://t.me/your-telegram-link" class="social-icon telegram"><i class="fab fa-telegram-plane"></i></a>
+                </div>
+            </li>
+        </ul>
+<li><strong>Де ми знаходимося:</strong> 
             <a href="https://maps.app.goo.gl/c1Y1X4TH5ZUzyfmQA" target="_blank">Подивитися на карті</a>
         </li>
         <!-- Вбудована карта -->

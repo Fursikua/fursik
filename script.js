@@ -214,12 +214,16 @@ function openProductDetailModal(article) {
         const fileUrl = `https://fursik-b40362fa22e8.herokuapp.com/${file}?t=${Date.now()}`; // Додаємо унікальний параметр
 
         if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-            return `<img src="${fileUrl}" alt="${product.name}" class="gallery-img" style="display: none;" onload="this.style.display='block';">`;
+            return `
+                <img src="${fileUrl}" alt="${product.name}" class="gallery-img" style="display: none;" onload="this.style.display='block';">
+            `;
         } else if (['mp4', 'avi', 'webm'].includes(fileExtension)) {
-            return `<video controls class="gallery-video">
-                        <source src="${fileUrl}" type="video/${fileExtension}">
-                        Ваш браузер не підтримує відтворення цього відео.
-                    </video>`;
+            return `
+                <video controls class="gallery-video" style="max-width: 100%; height: auto;">
+                    <source src="${fileUrl}" type="video/${fileExtension}">
+                    Ваш браузер не підтримує відтворення цього відео.
+                </video>
+            `;
         } else {
             return `<a href="${fileUrl}" target="_blank">Переглянути файл</a>`;
         }
@@ -231,8 +235,8 @@ function openProductDetailModal(article) {
     // Перевірка завантаження зображень
     const images = galleryContainer.querySelectorAll('.gallery-img');
     images.forEach(img => {
-        img.style.display = 'none';
-        img.onload = () => img.style.display = 'block';
+        img.style.display = 'none'; // Спочатку приховуємо зображення
+        img.onload = () => img.style.display = 'block'; // Показуємо після завантаження
     });
 
     // Відображення модифікацій
@@ -250,9 +254,21 @@ function openProductDetailModal(article) {
     productModal.style.display = 'flex';
     productModal.classList.add('active');
 
+    // Прокрутка до модифікацій
+    modificationsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
     // Зберігаємо артикул товару для функції "Додати в кошик"
     window.currentDetailModalProductArticle = product.article;
     window.currentSelectedModification = null; // Скидаємо вибрану модифікацію
+}
+
+// Функція для вибору модифікації товару
+function selectProductModification(modification, button) {
+    window.currentSelectedModification = modification;
+    // Зміна стилю вибраної модифікації
+    const buttons = document.querySelectorAll('.modification-btn');
+    buttons.forEach(btn => btn.classList.remove('selected'));
+    button.classList.add('selected');
 }
 
 // Функція для вибору модифікації
@@ -412,8 +428,7 @@ function renderProducts(products) {
                 <div class="prices">
                     ${oldPriceHTML} ${newPriceHTML}
                 </div>
-                <button onclick="addToCart('${product.article}')">Додати в кошик</button>
-            </div>
+                <button onclick="openProductDetailModal('${product.article}')">Додати в кошик</button>            </div>
         `;
     });
 

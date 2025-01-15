@@ -62,6 +62,98 @@ body {
 .site-logo a:hover {
     color: #007bff;
 }
+/* Контейнер для контактів */
+.contacts {
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Заголовок для секції контактів */
+.contacts h2 {
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Список контактів */
+.contact-list {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.contact-list li {
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    color: #f4f4f4;
+}
+
+.contact-list a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.contact-list a:hover {
+    text-decoration: underline;
+}
+
+/* Контейнер для соціальних мереж */
+.social-links {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+/* Стилі для іконок соціальних мереж */
+.social-icon {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+    transition: background-color 0.3s ease;
+}
+
+.social-icon:hover {
+    background-color: #007bff;
+}
+
+.social-icon.facebook {
+    background-color: #3b5998;
+}
+
+.social-icon.instagram {
+    background-color: #e1306c;
+}
+
+.social-icon.telegram {
+    background-color: #0088cc;
+}
+
+.social-icon i {
+    color: white;
+}
+
+.social-links .social-icon:hover i {
+    color: white;
+}
+/* Медіа-запит для мобільних пристроїв */
+@media (max-width: 1280px) {
+    /* Приховуємо секцію контактів та соціальних мереж на мобільних пристроях */
+    .contacts {
+        display: none;
+    }
+}
 
 /* Контейнер для пошукового рядка */
 .content-container {
@@ -474,6 +566,54 @@ header button:hover {
     }
 }
 
+/* Список товарів прихований за замовчуванням */
+#product-list {
+    display: none;
+}
+/* Контейнер для товарів */
+#product-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Сітка товарів */
+    gap: 20px;
+    padding: 20px;
+    display: none; /* Сховати за замовчуванням */
+}
+
+/* Для кожного товару */
+.product-item {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: white;
+    text-align: center;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.product-item:hover {
+    transform: scale(1.05); /* Легка анімація при наведенні */
+}
+
+.product-thumbnail {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.prices {
+    font-size: 1.2em;
+    margin-top: 10px;
+}
+
+.new-price {
+    color: green;
+}
+
+.old-price {
+    text-decoration: line-through;
+    color: red;
+}
 
 /* Продукти */
 .product-grid {
