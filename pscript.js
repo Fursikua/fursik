@@ -54,22 +54,6 @@ function searchProducts() {
 
 const productGrid = document.querySelector('.product-grid');
 
-function addModificationField() {
-    const container = document.getElementById("modifications-container");
-    const newField = document.createElement("div");
-    newField.className = "modification-field";
-    newField.innerHTML = `
-        <input type="text" name="modification" placeholder="Введіть модифікацію">
-        <button type="button" onclick="removeField(this)">-</button>
-    `;
-    container.appendChild(newField);
-}
-
-function removeField(button) {
-    const field = button.parentElement;
-    field.remove();
-}
-
 let products = [];
 
 async function loadProducts() {
@@ -357,6 +341,8 @@ function filterProductsByArticlePrefix(prefix) {
         }, 100); // Невелика затримка, щоб DOM встиг оновитися
     }
 }
+
+
 // Функція для прокрутки вліво
 function scrollLeft() {
     const promoWrapper = document.querySelector('.promo-products-wrapper');
@@ -437,6 +423,46 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCartDisplay();
 });
 
+
+let currentImageIndex = 0;
+let images = document.querySelectorAll('.product-thumbnail');
+let modal = document.getElementById("imagePreviewModal");
+let previewImage = document.getElementById("previewImage");
+let caption = document.getElementById("imageCaption");
+
+// Відкриває модальне вікно при кліку на зображення
+images.forEach((img, index) => {
+    img.addEventListener("click", function() {
+        openImageModal(index);
+    });
+});
+
+function openImageModal(index) {
+    modal.style.display = "block";
+    previewImage.src = images[index].src;
+    caption.innerHTML = images[index].alt;
+    currentImageIndex = index;
+}
+
+// Закриває модальне вікно
+function closeImageModal() {
+    modal.style.display = "none";
+}
+
+// Перемикає зображення вперед/назад
+function changeImage(direction) {
+    currentImageIndex += direction;
+
+    // Перевірка, щоб зациклювати зображення
+    if (currentImageIndex >= images.length) {
+        currentImageIndex = 0;
+    } else if (currentImageIndex < 0) {
+        currentImageIndex = images.length - 1;
+    }
+
+    previewImage.src = images[currentImageIndex].src;
+    caption.innerHTML = images[currentImageIndex].alt;
+}
 
 async function renderPromoProducts() {
     const promoSection = document.getElementById('promo-products');
@@ -818,6 +844,26 @@ function animateAddToCart(button) {
         setTimeout(() => cartIcon.classList.remove('bounce'), 500);
     }, 800);
 }
+// Функція для контролю видимості футера
+(function() {
+    let lastScrollY = window.scrollY;
+    const footer = document.querySelector('footer');
+
+    window.addEventListener('scroll', () => {
+        const currentScrollY = window.scrollY;
+
+        if (currentScrollY > lastScrollY) {
+            // Прокрутка вниз
+            footer.style.transform = 'translateY(100%)';
+            footer.style.transition = 'transform 0.3s ease';
+        } else {
+            // Прокрутка вверх
+            footer.style.transform = 'translateY(0)';
+        }
+
+        lastScrollY = currentScrollY;
+    });
+})();
 
 
 // Оновлюйте лічильник при завантаженні сторінки
