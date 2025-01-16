@@ -294,21 +294,25 @@ import re
 from werkzeug.utils import secure_filename
 
 def generate_slug(product):
-    """Генеруємо SEO-дружній URL з модифікаціями та описом"""
+    """Генерує SEO-дружній URL з назви, короткого опису та модифікацій."""
     name_part = product['name'].strip().lower()
-    name_part = re.sub(r'\s+', '-', name_part)  # Замінюємо пробіли на дефіси
-    name_part = re.sub(r'[^a-z0-9-]', '', name_part)  # Видаляємо всі символи, крім букв, цифр і дефісів
-
-    # Використовуємо модифікацію, якщо вона є
-    modification_part = '-'.join(product['modifications']).lower() if 'modifications' in product and product['modifications'] else ''
-
-    # Додаємо короткий опис (перші 20 символів)
-    description_part = product['description'][:100].strip().lower().replace(' ', '-')
+    name_part = re.sub(r'\s+', '-', name_part)
+    name_part = re.sub(r'[^a-z0-9-]', '', name_part)
+    
+    # Короткий опис
+    description_part = product['description'][:100].strip().lower()
+    description_part = re.sub(r'\s+', '-', description_part)
     description_part = re.sub(r'[^a-z0-9-]', '', description_part)
+    
+    # Модифікації
+    modifications_part = '-'.join(product.get('modifications', [])).strip().lower()
+    modifications_part = re.sub(r'\s+', '-', modifications_part)
+    modifications_part = re.sub(r'[^a-z0-9-]', '', modifications_part)
 
     # Формуємо slug
-    parts = filter(None, [name_part, modification_part, description_part])  # Вилучаємо пусті значення
-    return '-'.join(parts)
+    parts = [name_part, description_part, modifications_part]
+    slug = '-'.join(filter(None, parts))  # Видаляємо порожні частини
+    return f"{product['article']}-{slug}"
 
 
 if __name__ == '__main__':

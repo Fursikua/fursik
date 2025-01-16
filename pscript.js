@@ -136,7 +136,7 @@ function renderProducts(products) {
             `
             : '';
 
-        const slug = `${product.article}-${product.name.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')}`;
+            const slug = `${product.article}-${product.name.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')}-${product.description.substring(0, 100).toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')}-${product.modifications ? product.modifications.join('-').toLowerCase() : ''}`;
 
         productList.innerHTML += `
             <div class="product-item">
@@ -515,7 +515,7 @@ async function renderPromoProducts() {
                 ? product.description.substring(0, 100) + '...'
                 : product.description;
 
-                const slug = `${product.article}-${product.name.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')}`;
+                const slug = `${product.article}-${product.name.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')}-${product.description.substring(0, 100).toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')}-${product.modifications ? product.modifications.join('-').toLowerCase() : ''}`;
 
             promoWrapper.innerHTML += `
                 <div class="promo-item" data-index="${index}">
