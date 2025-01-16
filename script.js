@@ -415,12 +415,15 @@ function renderProducts(products) {
             `
             : '';
 
-            const slug = `${product.article}-${product.name.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')}-${product.description.slice(0, 50).replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')}`;
+        const slug = `${product.article}-${product.name.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')}`;
+
         productList.innerHTML += `
             <div class="product-item">
                 <h3><a href="/product/${slug}" target="_blank">${product.name}</a></h3>
+                <p>Артикул: ${product.article}</p>
                 <div id="media-${index}" class="image-gallery" data-product-index="${index}">${gallery}</div>
                 ${navigationButtons}
+                <p id="description-${index}">${shortDescription}</p>
                 <button onclick="openProductDetailModal('${product.article}')">Детальніше</button>
                 <div class="prices">
                     ${oldPriceHTML} ${newPriceHTML}
