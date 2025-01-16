@@ -290,10 +290,25 @@ def product_page(slug):
     # Використовуємо HTML-шаблон для створення сторінки
     return render_template('product.html', product=product, cart=cart_data, title=product['name'])
 
+import re
+from werkzeug.utils import secure_filename
+
 def generate_slug(product):
-    """Генеруємо SEO-дружній URL"""
-    name_part = secure_filename(product['name']).replace('_', '-').lower()
-    return f"{product['article']}-{name_part}"
+    """Генеруємо SEO-дружній URL з модифікаціями та описом"""
+    name_part = product['name'].strip().lower()
+    name_part = re.sub(r'\s+', '-', name_part)  # Замінюємо пробіли на дефіси
+    name_part = re.sub(r'[^a-z0-9-]', '', name_part)  # Видаляємо всі символи, крім букв, цифр і дефісів
+
+    # Використовуємо модифікацію, якщо вона є
+    modification_part = '-'.join(product['modifications']).lower() if 'modifications' in product and product['modifications'] else ''
+
+    # Додаємо короткий опис (перші 20 символів)
+    description_part = product['description'][:100].strip().lower().replace(' ', '-')
+    description_part = re.sub(r'[^a-z0-9-]', '', description_part)
+
+    # Формуємо slug
+    parts = filter(None, [name_part, modification_part, description_part])  # Вилучаємо пусті значення
+    return '-'.join(parts)
 
 
 if __name__ == '__main__':

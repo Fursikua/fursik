@@ -2,6 +2,36 @@ document.addEventListener('DOMContentLoaded', function () {
     updateCartCount();
     updateCartDisplay(); // Якщо потрібно також оновити відображення деталей кошика
 });
+// Завантаження товарів після завантаження сторінки
+document.addEventListener('DOMContentLoaded', () => {
+    // Завантаження товарів і оновлення відображення кошика
+    loadProducts().then(() => {
+        renderPromoProducts(products);
+    });
+    updateCartDisplay();
+});
+// Викликаємо функцію після завантаження сторінки
+document.addEventListener('DOMContentLoaded', hideNavigationButtonsForTouchDevices);
+window.addEventListener('resize', hideNavigationButtonsForTouchDevices);
+document.addEventListener("DOMContentLoaded", function () {
+    const toggleButton = document.getElementById("view-toggle-btn");
+    const originalOffsetTop = toggleButton.offsetTop; // Початкове положення кнопки
+
+    window.addEventListener("scroll", function () {
+        if (window.scrollY > originalOffsetTop) {
+            toggleButton.classList.add("fixed");
+        } else {
+            toggleButton.classList.remove("fixed");
+        }
+    });
+    const element = document.querySelector('#yourElementId');
+if (element) {
+    element.addEventListener('click', () => {
+        // Your code here
+    });
+}
+
+});
 
 
 // Відображення модального вікна при натисканні на кнопку "Вхід"
@@ -191,18 +221,6 @@ function toggleView() {
         toggleBtn.textContent = 'Повернути стандартний вигляд';
     }
 }
-document.addEventListener("DOMContentLoaded", function () {
-    const toggleButton = document.getElementById("view-toggle-btn");
-    const originalOffsetTop = toggleButton.offsetTop; // Початкове положення кнопки
-
-    window.addEventListener("scroll", function () {
-        if (window.scrollY > originalOffsetTop) {
-            toggleButton.classList.add("fixed");
-        } else {
-            toggleButton.classList.remove("fixed");
-        }
-    });
-});
 
 function hideNavigationButtonsForTouchDevices() {
     // Перевірка на сенсорний пристрій
@@ -219,9 +237,6 @@ function hideNavigationButtonsForTouchDevices() {
     }
 }
 
-// Викликаємо функцію після завантаження сторінки
-document.addEventListener('DOMContentLoaded', hideNavigationButtonsForTouchDevices);
-window.addEventListener('resize', hideNavigationButtonsForTouchDevices);
 
 function enableSwipe() {
     const allMediaContainers = document.querySelectorAll('.image-gallery'); // Отримуємо всі галереї
@@ -355,7 +370,6 @@ function scrollRight() {
     promoWrapper.scrollBy({ left: 300, behavior: 'smooth' });
 }
 
-document.addEventListener('DOMContentLoaded', renderPromoProducts);
 
 document.querySelectorAll('.nav-bar a').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
@@ -414,14 +428,6 @@ document.addEventListener("DOMContentLoaded", function () {
 })();
 
 
-// Завантаження товарів після завантаження сторінки
-document.addEventListener('DOMContentLoaded', () => {
-    // Завантаження товарів і оновлення відображення кошика
-    loadProducts().then(() => {
-        renderPromoProducts(products);
-    });
-    updateCartDisplay();
-});
 
 
 let currentImageIndex = 0;

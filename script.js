@@ -420,10 +420,8 @@ function renderProducts(products) {
         productList.innerHTML += `
             <div class="product-item">
                 <h3><a href="/product/${slug}" target="_blank">${product.name}</a></h3>
-                <p>Артикул: ${product.article}</p>
                 <div id="media-${index}" class="image-gallery" data-product-index="${index}">${gallery}</div>
                 ${navigationButtons}
-                <p id="description-${index}">${shortDescription}</p>
                 <button onclick="openProductDetailModal('${product.article}')">Детальніше</button>
                 <div class="prices">
                     ${oldPriceHTML} ${newPriceHTML}
