@@ -415,8 +415,7 @@ function renderProducts(products) {
             `
             : '';
 
-            const slug = `${product.article}-${product.name.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')}-${product.description.substring(0, 100).toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')}-${product.modifications ? product.modifications.join('-').toLowerCase() : ''}`;
-
+            const slug = `${product.article}-${product.name.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')}-${product.description.slice(0, 50).replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')}`;
         productList.innerHTML += `
             <div class="product-item">
                 <h3><a href="/product/${slug}" target="_blank">${product.name}</a></h3>
@@ -696,7 +695,7 @@ async function renderPromoProducts() {
                 ? product.description.substring(0, 100) + '...'
                 : product.description;
 
-                const slug = `${product.article}-${product.name.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')}-${product.description.substring(0, 100).toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')}-${product.modifications ? product.modifications.join('-').toLowerCase() : ''}`;
+                const slug = `${product.article}-${product.name.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')}`;
 
             promoWrapper.innerHTML += `
                 <div class="promo-item">

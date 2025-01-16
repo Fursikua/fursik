@@ -262,57 +262,41 @@ from flask import render_template, request
 
 @app.route('/product/<string:slug>')
 def product_page(slug):
-    # Знаходимо товар за slug
     product = next((p for p in products if slug == generate_slug(p)), None)
     if not product:
         return render_template('404.html', message="Товар не знайдено", title="Помилка 404"), 404
 
-    # Отримуємо дані кошика з localStorage через куки (якщо використовуються)
-    cart_data = request.cookies.get('cart')
-    if cart_data:
-        try:
-            cart_data = json.loads(cart_data)
-        except json.JSONDecodeError:
-            cart_data = {'items': [], 'total': 0}
-    else:
-        cart_data = {'items': [], 'total': 0}
-
-    # Перевірка структури cart_data та додавання відсутніх ключів
-    if not isinstance(cart_data, dict):
-        cart_data = {'items': [], 'total': 0}
-    cart_data.setdefault('items', [])
-    cart_data.setdefault('total', 0)
-
-        # Додаємо перевірку для старої ціни
-    if 'old_price' not in product:
-        product['old_price'] = None  # Якщо стара ціна відсутня
-
-    # Використовуємо HTML-шаблон для створення сторінки
-    return render_template('product.html', product=product, cart=cart_data, title=product['name'])
+    return render_template('product.html', product=product, title=product['name'])
 
 import re
-from werkzeug.utils import secure_filename
 
 def generate_slug(product):
-    """Генерує SEO-дружній URL з назви, короткого опису та модифікацій."""
-    name_part = product['name'].strip().lower()
-    name_part = re.sub(r'\s+', '-', name_part)
+    """Генерує SEO-дружній slug на основі даних товару."""
+    # Форматування назви
+    name_part = re.sub(r'\s+', '-', product['name'].strip().lower())
     name_part = re.sub(r'[^a-z0-9-]', '', name_part)
-    
-    # Короткий опис
-    description_part = product['description'][:100].strip().lower()
-    description_part = re.sub(r'\s+', '-', description_part)
-    description_part = re.sub(r'[^a-z0-9-]', '', description_part)
-    
-    # Модифікації
-    modifications_part = '-'.join(product.get('modifications', [])).strip().lower()
-    modifications_part = re.sub(r'\s+', '-', modifications_part)
-    modifications_part = re.sub(r'[^a-z0-9-]', '', modifications_part)
 
-    # Формуємо slug
-    parts = [name_part, description_part, modifications_part]
-    slug = '-'.join(filter(None, parts))  # Видаляємо порожні частини
-    return f"{product['article']}-{slug}"
+    # Форматування опису (перші 50 символів)
+    description_part = re.sub(r'\s+', '-', product['description'][:50].strip().lower())
+    description_part = re.sub(r'[^a-z0-9-]', '', description_part)
+
+    # Форматування модифікацій
+    if product.get('modifications'):
+        modifications_part = '-'.join(product['modifications']).strip().lower()
+        modifications_part = re.sub(r'\s+', '-', modifications_part)
+        modifications_part = re.sub(r'[^a-z0-9-]', '', modifications_part)
+    else:
+        modifications_part = ''
+
+    # Артикул як обов'язкова частина
+    article_part = product['article']
+
+    # Об'єднання всіх частин
+    slug = f"{article_part}-{name_part}-{description_part}"
+    if modifications_part:
+        slug += f"-{modifications_part}"
+
+    return slug
 
 
 if __name__ == '__main__':

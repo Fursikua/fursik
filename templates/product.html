@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Інтернет-магазин "FursikUA"</title>
-    <link rel="icon" href="/images\DALL·E 2024-12-12 13.58.44 - A sleek and modern emblem for 'FursikUA', an online store. The emblem should feature a circular design with a playful and minimalist fur animal icon (.ico" type="image/x-icon">
-    <title>{{ product.name }}{% if product.modifications %} - {{ product.modifications | join(', ') }}{% endif %}</title>
-    <meta name="description" content="{{ product.description[:150] }}">
-    <meta name="keywords" content="{{ product.name }}, {{ product.modifications | join(', ') }}, купити, {{ product.description[:30] }}">    <link rel="stylesheet" href="/pstyle.css">
-    <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ product.name }}{% if product.modifications %} - {{ product.modifications | join(', ') }}{% endif %}</title>
+        <meta name="description" content="{{ product.description[:150] }}">
+        <meta name="keywords" content="{{ product.name }}, {{ product.modifications | join(', ') }}, купити, {{ product.description[:30] }}">
+        <link rel="stylesheet" href="/pstyle.css">
+        <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    </head>
+    <body>
     <div class="header-container">
         <div class="header-left">
             <!-- Основне меню -->
@@ -110,46 +108,46 @@
 
     <button onclick="addToCartWithModification('{{ product.article }}'); animateAddToCart(this);">Додати в кошик</button>
     
-    <h1>{{ product.name }}</h1>
-    <section class="product-image-gallery">
-        <div class="image-thumbnails">
-            {% for file in product.files %}
-                <img src="{{ file }}" alt="{{ product.name }} - {{ product.description[:50] }}" class="product-thumbnail" style="width:200px; margin:5px;">
-            {% endfor %}
-        </div>
-    </section>
-    
-    <!-- Модальне вікно для перегляду зображень -->
-    <div id="imagePreviewModal" class="image-preview-modal">
-        <span class="modal-close" onclick="closeImageModal()">&times;</span>
-        <img class="preview-image" id="previewImage">
-        <div class="image-caption" id="imageCaption"></div>
-        <button class="navigate-button prev-button" onclick="changeImage(-1)">&#10094;</button>
-        <button class="navigate-button next-button" onclick="changeImage(1)">&#10095;</button>
+<h1>{{ product.name }}</h1>
+<section class="product-image-gallery">
+    <div class="image-thumbnails">
+        {% for file in product.files %}
+            <img src="{{ file }}" alt="{{ product.name }} - {{ product.description[:50] }}" class="product-thumbnail" style="width:200px; margin:5px;">
+        {% endfor %}
     </div>
-    
-    <div id="product-details">
-        {% if product.modifications and product.modifications|length > 0 %}
-            <p>Модифікації: {{ product.modifications | join(', ') }}</p>
-        {% endif %}
-        <p>Опис: {{ product.description }}</p>
-        {% if product.oldPrice %}
-            <p>Стара ціна: <span style="text-decoration: line-through; color: #e60000;">{{ product.oldPrice }} грн</span></p>
-        {% endif %}
-        <p>Ціна: <span style="font-weight: bold;">{{ product.price }} грн</span></p>
-    </div>
-    
+</section>
+
+<!-- Модальне вікно для перегляду зображень -->
+<div id="imagePreviewModal" class="image-preview-modal">
+    <span class="modal-close" onclick="closeImageModal()">&times;</span>
+    <img class="preview-image" id="previewImage">
+    <div class="image-caption" id="imageCaption"></div>
+    <button class="navigate-button prev-button" onclick="changeImage(-1)">&#10094;</button>
+    <button class="navigate-button next-button" onclick="changeImage(1)">&#10095;</button>
+</div>
+
+<div id="product-details">
     {% if product.modifications and product.modifications|length > 0 %}
-    <div id="modifications-container">
-        <label for="modification-select">Оберіть модифікацію:</label>
-        <select id="modification-select">
-            {% for mod in product.modifications %}
-            <option value="{{ mod }}">{{ mod }}</option>
-            {% endfor %}
-        </select>
-    </div>
+        <p>Модифікації: {{ product.modifications | join(', ') }}</p>
     {% endif %}
-        <button onclick="addToCartWithModification('{{ product.article }}'); animateAddToCart(this);">Додати в кошик</button>
+    <p>Опис: {{ product.description }}</p>
+    {% if product.oldPrice %}
+        <p>Стара ціна: <span style="text-decoration: line-through; color: #e60000;">{{ product.oldPrice }} грн</span></p>
+    {% endif %}
+    <p>Ціна: <span style="font-weight: bold;">{{ product.price }} грн</span></p>
+</div>
+
+{% if product.modifications and product.modifications|length > 0 %}
+<div id="modifications-container">
+    <label for="modification-select">Оберіть модифікацію:</label>
+    <select id="modification-select">
+        {% for mod in product.modifications %}
+        <option value="{{ mod }}">{{ mod }}</option>
+        {% endfor %}
+    </select>
+</div>
+{% endif %}
+    <button onclick="addToCartWithModification('{{ product.article }}'); animateAddToCart(this);">Додати в кошик</button>
 <button onclick="window.location.href='/'">Повернутися до головної</button>
 
 </header>
