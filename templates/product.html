@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ product.name }} - Купити за {{ product.price }} грн</title>
     <title>Інтернет-магазин "FursikUA"</title>
     <link rel="icon" href="/images\DALL·E 2024-12-12 13.58.44 - A sleek and modern emblem for 'FursikUA', an online store. The emblem should feature a circular design with a playful and minimalist fur animal icon (.ico" type="image/x-icon">
+    <title>{{ product.name }} - Купити за {{ product.price }} грн</title>
     <meta name="description" content="{{ product.description }}">
-    <meta name="keywords" content="{{ product.name }}, купити, {{ product.article }}">
-    <link rel="stylesheet" href="/pstyle.css">
+    <meta name="keywords" content="{{ product.name }}, {{ product.article }}">
+        <link rel="stylesheet" href="/pstyle.css">
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
@@ -115,7 +115,7 @@
     <section class="product-image-gallery">
         <div class="image-thumbnails">
             {% for file in product.files %}
-                <img src="{{ file }}" alt="{{ product.name }}, {{ product.description }}" class="product-thumbnail" style="width:200px; margin:5px;">
+                <img src="{{ file }}" alt="{{ product.name }}" class="product-thumbnail" style="width:200px; margin:5px;">
             {% endfor %}
         </div>
     </section>
@@ -224,6 +224,7 @@
 <footer>
     &copy; 2024 Інтернет-магазин "FursikUA". Всі права захищені.
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/slugify@1.6.6/slugify.min.js"></script>
 
 <script src="/pscript.js" defer></script>
 

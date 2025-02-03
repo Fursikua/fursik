@@ -211,7 +211,7 @@ function openProductDetailModal(article) {
     // Галерея зображень або відео
     const gallery = product.files.map(file => {
         const fileExtension = file.split('.').pop().toLowerCase();
-        const fileUrl = `https://fursik-b40362fa22e8.herokuapp.com/${file}?t=${Date.now()}`; // Додаємо унікальний параметр
+        const fileUrl = `http://127.0.0.1:5000/${file}?t=${Date.now()}`; // Додаємо унікальний параметр
 
         if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
             return `
@@ -366,7 +366,7 @@ let products = [];
 
 async function loadProducts() {
     try {
-        const response = await fetch('https://fursik-b40362fa22e8.herokuapp.com/products');
+        const response = await fetch('http://127.0.0.1:5000/products');
         if (!response.ok) throw new Error('Помилка завантаження товарів');
         products = await response.json();
         renderProducts(products);
@@ -390,7 +390,7 @@ function renderProducts(products) {
 
         const gallery = product.files.map((file, fileIndex) => {
             const fileExtension = file.split('.').pop().toLowerCase();
-            const fileUrl = `https://fursik-b40362fa22e8.herokuapp.com/${file}`;
+            const fileUrl = `http://127.0.0.1:5000/${file}`;
 
             if (['mp4', 'mov', 'avi', 'webm'].includes(fileExtension)) {
                 return `
@@ -415,7 +415,7 @@ function renderProducts(products) {
             `
             : '';
 
-        const slug = `${product.article}-${product.name.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '')}`;
+        const slug = `${product.article}-${transliterate(product.name.toLowerCase().replace(/[ь]/g, '').replace(/\s/g, '_').replace(/[^a-zа-яіЇ0-9_-]/g, ''))}`;
 
         productList.innerHTML += `
             <div class="product-item">
@@ -435,6 +435,20 @@ function renderProducts(products) {
     enableSwipe(); // Додаємо підтримку свайпів для всіх товарів
 }
 
+function transliterate(text) {
+    const map = {
+        а: 'a', б: 'b', в: 'v', г: 'h', д: 'd', е: 'e', є: 'ye', ж: 'zh', з: 'z', и: 'y', 
+        і: 'i', ї: 'yi', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', 
+        с: 's', т: 't', у: 'u', ф: 'f', х: 'kh', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'shch', 
+        ы: 'y', э: 'e', ю: 'yu', я: 'ya', ь: '', ' ': ' ', '.': '.', ',': ',', ';': ';', 
+        '?': '?', '!': '!', '-': '-', ':': ':', '"': '"', "'": "'",
+
+        // Додаткові літери для більш точного перекладу
+        'і': 'i', 'ї': 'yi', 'є': 'ye', 'ї': 'yi', 'є': 'ye'
+    };
+
+    return text.split('').map(char => map[char.toLowerCase()] || char).join('');
+}
 function addProduct(event) {
     event.preventDefault();
 
@@ -452,7 +466,7 @@ function addProduct(event) {
         formData.append('file', fileInput.files[i]);
     }
 
-    fetch('https://fursik-b40362fa22e8.herokuapp.com/upload', {
+    fetch('http://127.0.0.1:5000/upload', {
         method: 'POST',
         body: formData,
     })
@@ -658,7 +672,7 @@ async function renderPromoProducts() {
     const promoWrapper = promoSection.querySelector('.promo-products-wrapper');
     
     try {
-        const response = await fetch('https://fursik-b40362fa22e8.herokuapp.com/products');
+        const response = await fetch('http://127.0.0.1:5000/products');
         if (!response.ok) throw new Error('Помилка завантаження товарів');
 
         const products = await response.json();
@@ -676,7 +690,7 @@ async function renderPromoProducts() {
 
             const gallery = product.files.map((file, fileIndex) => {
                 const fileExtension = file.split('.').pop().toLowerCase();
-                const fileUrl = `https://fursik-b40362fa22e8.herokuapp.com/${file}`;
+                const fileUrl = `http://127.0.0.1:5000/${file}`;
 
                 if (['mp4', 'mov', 'avi'].includes(fileExtension)) {
                     return `

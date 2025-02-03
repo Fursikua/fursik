@@ -7,6 +7,10 @@ CORS(app, resources={r"/*": {"origins": "*"}})  # Дозволяє всі дже
 import os
 import uuid
 from werkzeug.utils import secure_filename
+from transliterate import translit
+
+import logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 UPLOAD_FOLDER = 'upload'
@@ -292,7 +296,8 @@ def product_page(slug):
 
 def generate_slug(product):
     """Генеруємо SEO-дружній URL"""
-    name_part = secure_filename(product['name']).replace('_', '-').lower()
+    name_part = secure_filename(translit(product['name'], language_code='uk', reversed=True)).lower()
+    logging.debug(f"{product['article']}-{translit(name_part, language_code='uk', reversed=True)}")
     return f"{product['article']}-{name_part}"
 
 
